@@ -2,106 +2,89 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Swagat Das | AI, CPS, LiDAR</title>
 
 <style>
 
-/* BACKGROUND */
+/* ===== GLOBAL ===== */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  max-width: 1100px;
-  margin: 60px auto;
-  padding: 0 20px;
-  color: #e5e7eb;
-
-  background: radial-gradient(circle at top, #0f2e25, #081c15);
+  margin: 0;
+  padding: 0;
+  color: #e6f4f1;
+  background: linear-gradient(180deg, #081c15, #0b2f26);
+  overflow-x: hidden;
 }
 
-/* HEADINGS */
+/* cursor glow */
+.cursor {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(52,211,153,0.4);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: 0.05s;
+  z-index: 999;
+}
+
+/* layout */
+.container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 60px 20px;
+}
+
+/* headings */
 h1 {
   font-size: 2.8rem;
   color: #ecfdf5;
 }
 
-.tagline {
-  color: #a7f3d0;
-  margin-bottom: 1.5rem;
+h2 {
+  margin-top: 80px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 10px;
 }
 
-/* LINKS */
-.links a {
-  margin-right: 15px;
+/* links */
+a {
   color: #34d399;
   text-decoration: none;
 }
 
-.links a:hover {
-  color: #6ee7b7;
-}
-
-/* SECTION HEADERS */
-h2 {
-  margin-top: 3rem;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  padding-bottom: 0.4rem;
-  color: #d1fae5;
-}
-
-/* GRID */
+/* cards */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 18px;
+  gap: 20px;
 }
 
-/* CARD */
 .card {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
+  padding: 20px;
   border-radius: 14px;
-  padding: 18px;
   transition: all 0.3s ease;
-  backdrop-filter: blur(6px);
 }
 
-/* HOVER EFFECT */
 .card:hover {
-  transform: translateY(-6px) scale(1.04);
+  transform: scale(1.05);
   border-color: #34d399;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
 }
 
-/* TEXT INSIDE CARD */
-.card strong {
-  color: #ecfdf5;
-}
-
-.tag {
-  font-size: 0.8rem;
-  color: #6ee7b7;
-  margin-top: 5px;
-}
-
-/* HIDDEN DESCRIPTION */
-.card p {
+/* scroll animation */
+.section {
   opacity: 0;
-  max-height: 0;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  color: #a7f3d0;
+  transform: translateY(40px);
+  transition: all 0.8s ease;
 }
 
-.card:hover p {
+.section.show {
   opacity: 1;
-  max-height: 200px;
-  margin-top: 10px;
-}
-
-/* ABOUT TEXT */
-p {
-  color: #d1fae5;
+  transform: translateY(0);
 }
 
 </style>
@@ -109,108 +92,119 @@ p {
 
 <body>
 
-<!-- HERO -->
-<h1>Swagat Das</h1>
-<p class="tagline">
-PhD Student · Artificial Intelligence · Cyber-Physical Systems · Self-Supervised Learning · LiDAR
-</p>
+<div class="cursor"></div>
 
-<div class="links">
-<a href="https://scholar.google.com/citations?user=_X50sTMAAAAJ">Scholar</a>
-<a href="https://www.linkedin.com/in/swagat-das">LinkedIn</a>
-<a href="https://www.researchgate.net/profile/Swagat-Das">ResearchGate</a>
-<a href="https://orcid.org/0000-0003-2263-0217">ORCID</a>
-</div>
+<div class="container">
+
+<!-- HERO -->
+<section class="section">
+<h1>Swagat Das</h1>
+<p>PhD Student · Artificial Intelligence · Cyber-Physical Systems · Self-Supervised Learning · LiDAR</p>
+
+<p>
+<a href="https://scholar.google.com">Scholar</a> · 
+<a href="https://linkedin.com">LinkedIn</a> · 
+<a href="https://researchgate.net">ResearchGate</a> · 
+<a href="https://orcid.org">ORCID</a>
+</p>
+</section>
 
 <!-- ABOUT -->
+<section class="section">
 <h2>About</h2>
 <p>
-PhD student at Virginia Commonwealth University working on scalable AI systems for cyber-physical and infrastructure environments. My work focuses on self-supervised learning, anomaly detection, and large-scale perception systems where real-world constraints matter as much as model accuracy.
+I am a PhD student in Computer Science at Virginia Commonwealth University working at the intersection of artificial intelligence, deep learning, and cybersecurity. My work focuses on building data-driven systems that operate reliably outside controlled environments, particularly in cyber-physical systems and large-scale infrastructure settings where constraints, uncertainty, and robustness are critical.
 </p>
 
+<p>
+My research spans self-supervised learning for anomaly detection, scalable machine learning pipelines, and 3D LiDAR perception. I work on problems where labeled data is limited, systems evolve over time, and deployment requirements are as important as model performance.
+</p>
+
+<p>
+Before starting my PhD, I served as an Assistant Professor with over 5000 hours of university teaching experience. My work included curriculum development, accreditation processes (ABET, NBA, QS), industry collaborations, and mentoring international students across diverse academic programs.
+</p>
+</section>
+
 <!-- PROJECTS -->
+<section class="section">
 <h2>Projects</h2>
 
 <div class="grid">
 
 <div class="card">
-<strong>LiDAR Semantic Segmentation</strong>
-<div class="tag">VIPC · Timmons Group</div>
+<strong>Large-Scale Aerial LiDAR Segmentation</strong>
 <p>
-Scalable deep learning pipelines for aerial point cloud segmentation addressing domain shift, class imbalance, and HPC-scale training.
+Designed scalable deep learning pipelines for semantic segmentation of aerial LiDAR point clouds. Addressed domain shift, class imbalance, and large-scale training using HPC infrastructure. Developed production-ready workflows from data ingestion to model deployment.
 </p>
 </div>
 
 <div class="card">
 <strong>eVISION EV Health Platform</strong>
-<div class="tag">INL · DoE</div>
 <p>
-Graph-Time Transformer forecasting models with large-scale data pipelines (~1M sessions) and geospatial analytics dashboard.
-</p>
-</div>
-
-<div class="card">
-<strong>ECG AI Diagnostic Pipeline</strong>
-<div class="tag">Deep Learning</div>
-<p>
-Self-supervised learning and neural style transfer for early-stage ECG anomaly detection.
+Developed a large-scale analytics system for EV charger health monitoring using ~1M sessions. Built Graph-Time Transformer models for forecasting and a geospatial dashboard using Dash and Mapbox.
 </p>
 </div>
 
 </div>
+</section>
 
 <!-- PUBLICATIONS -->
+<section class="section">
 <h2>Publications</h2>
 
 <div class="grid">
 
 <div class="card">
-<strong>Learning Beyond Labels (IECON 2025)</strong>
-<p>
-Survey of self-supervised learning approaches for anomaly detection in cyber-physical systems including JEPA and hybrid SSL.
-</p>
+<a href="#" target="_blank">
+<strong>Learning Beyond Labels – IECON 2025</strong>
+<p>Comprehensive survey of self-supervised learning methods for anomaly detection in cyber-physical systems.</p>
+</a>
 </div>
 
 <div class="card">
-<strong>KPU-Net (IECON 2025)</strong>
-<p>
-KPConv-based U-Net architecture for robust and scalable LiDAR segmentation.
-</p>
+<a href="#" target="_blank">
+<strong>KPU-Net – IECON 2025</strong>
+<p>LiDAR segmentation architecture using KPConv and U-Net for improved accuracy and scalability.</p>
+</a>
 </div>
 
 <div class="card">
-<strong>GAP-CAN (ICPS 2025)</strong>
-<p>
-Adversarial attack framework for transformer-based CAN bus anomaly detection.
-</p>
+<a href="#" target="_blank">
+<strong>GAP-CAN – ICPS 2025</strong>
+<p>Adversarial attack framework for transformer-based CAN bus anomaly detection.</p>
+</a>
 </div>
 
+<!-- ADD REMAINING PAPERS SAME FORMAT -->
+
 </div>
+</section>
 
 <!-- PATENTS -->
+<section class="section">
 <h2>Patents</h2>
 
 <div class="grid">
 
 <div class="card">
 <strong>Edge Computing-Based Fault Detection for DG Units</strong>
-<div class="tag">May 2024</div>
 <p>
-Real-time fault detection and localization framework for distributed generation systems using edge computing.
+Proposes an edge-based architecture for real-time detection and localization of faults in distributed generation systems within power distribution networks, enabling faster response and improved system resilience.
 </p>
 </div>
 
 <div class="card">
 <strong>IoT-Based Data Acquisition Server Machine</strong>
-<div class="tag">Jan 2024</div>
 <p>
-Scalable IoT-based architecture for distributed data acquisition and infrastructure monitoring.
+Developed a scalable IoT framework for real-time data acquisition and monitoring across distributed systems, supporting integration with analytics and control platforms.
 </p>
 </div>
 
 </div>
+</section>
 
 <!-- EXPERIENCE -->
+<section class="section">
 <h2>Experience</h2>
 
 <div class="grid">
@@ -218,31 +212,69 @@ Scalable IoT-based architecture for distributed data acquisition and infrastruct
 <div class="card">
 <strong>Research Assistant – VCU</strong>
 <p>
-EV infrastructure analytics, CPS datasets, real-time pipelines, MLOps, and time-series modeling.
+Working on EV infrastructure analytics, CPS datasets, time-series forecasting, and scalable MLOps pipelines integrating real-time environmental and geospatial data.
 </p>
 </div>
 
 <div class="card">
 <strong>Assistant Professor – KIIT</strong>
 <p>
-5000+ hours teaching, curriculum development, labs, and industry collaboration.
-</p>
-</div>
-
-<div class="card">
-<strong>Assistant Director – QA</strong>
-<p>
-Accreditation (ABET, QS, NBA) and institutional academic quality systems.
+Delivered courses in power systems, renewable energy, IoT, and energy storage. Established labs, developed curriculum, and mentored students across programs.
 </p>
 </div>
 
 </div>
+</section>
 
 <!-- EDUCATION -->
+<section class="section">
 <h2>Education</h2>
+
 <p>
-PhD – VCU · MS – UMKC · BTech – KIIT
+<strong>PhD – Computer Science</strong><br>
+Virginia Commonwealth University<br>
+Relevant coursework: Machine Learning, Deep Learning, Data Mining, Advanced Algorithms
 </p>
+
+<p>
+<strong>MS – Electrical Engineering</strong><br>
+University of Missouri–Kansas City<br>
+Relevant coursework: Power Systems, Control Systems, Embedded Systems
+</p>
+
+<p>
+<strong>BTech – Electrical Engineering</strong><br>
+KIIT University<br>
+Relevant coursework: Circuit Theory, Power Electronics, Electrical Machines
+</p>
+
+</section>
+
+</div>
+
+<script>
+
+/* scroll animation */
+const sections = document.querySelectorAll('.section');
+
+window.addEventListener('scroll', () => {
+  sections.forEach(sec => {
+    const top = sec.getBoundingClientRect().top;
+    if(top < window.innerHeight - 100){
+      sec.classList.add('show');
+    }
+  });
+});
+
+/* cursor glow */
+const cursor = document.querySelector('.cursor');
+
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+});
+
+</script>
 
 </body>
 </html>
