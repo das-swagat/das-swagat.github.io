@@ -6,335 +6,1038 @@
 <title>Swagat Das | AI, CPS, LiDAR</title>
 
 <style>
-
-/* ===== GLOBAL ===== */
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  margin: 0;
-  padding: 0;
-  color: #e6f4f1;
-  background: linear-gradient(180deg, #081c15, #0b2f26);
-  overflow-x: hidden;
+/* ===== BASE ===== */
+:root{
+  --bg-1:#081c15;
+  --bg-2:#0b2f26;
+  --panel:rgba(16,185,129,0.08);
+  --panel-dark:rgba(0,0,0,0.22);
+  --border:rgba(52,211,153,0.25);
+  --border-soft:rgba(255,255,255,0.08);
+  --text:#e6f4f1;
+  --muted:#cde9e1;
+  --accent:#34d399;
+  --accent-soft:#6ee7b7;
+  --white:#ecfdf5;
+  --shadow:0 15px 40px rgba(0,0,0,0.38);
 }
 
-/* cursor glow */
-.cursor {
-  position: fixed;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: rgba(52,211,153,0.4);
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-  transition: 0.05s;
-  z-index: 999;
+*{
+  box-sizing:border-box;
 }
 
-/* layout */
-.container {
-  max-width: 1000px;
-  margin: auto;
-  padding: 60px 20px;
+html{
+  scroll-behavior:smooth;
 }
 
-/* headings */
-h1 {
-  font-size: 2.8rem;
-  color: #ecfdf5;
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  margin:0;
+  padding:0;
+  color:var(--text);
+  background:linear-gradient(180deg,var(--bg-1),var(--bg-2));
+  overflow-x:hidden;
+  position:relative;
 }
 
-h2 {
-  margin-top: 80px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  padding-bottom: 10px;
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  width:360px;
+  height:360px;
+  border-radius:50%;
+  filter:blur(110px);
+  opacity:0.18;
+  pointer-events:none;
+  z-index:0;
+  animation:floatGlow 16s ease-in-out infinite;
 }
 
-/* links */
-a {
-  color: #34d399;
-  text-decoration: none;
+body::before{
+  top:-120px;
+  left:-80px;
+  background:#16a34a;
 }
 
-/* cards */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
+body::after{
+  right:-120px;
+  bottom:-80px;
+  background:#0ea5a4;
+  animation-delay:4s;
 }
 
-.card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  padding: 20px;
-  border-radius: 14px;
-  transition: all 0.3s ease;
+@keyframes floatGlow{
+  0%{transform:translate(0,0) scale(1);}
+  50%{transform:translate(30px,20px) scale(1.08);}
+  100%{transform:translate(0,0) scale(1);}
 }
 
-.card:hover {
-  transform: scale(1.05);
-  border-color: #34d399;
+/* ===== CURSOR GLOW ===== */
+.cursor-dot,
+.cursor-halo{
+  position:fixed;
+  top:0;
+  left:0;
+  pointer-events:none;
+  z-index:9999;
+  transform:translate(-50%,-50%);
 }
 
-/* scroll animation */
-.section {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: all 0.8s ease;
+.cursor-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:rgba(110,231,183,0.95);
+  box-shadow:0 0 16px rgba(110,231,183,0.8);
 }
 
-.section.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-/* ===== STORY SECTION (ADD THIS) ===== */
-
-.story-section {
-  margin-top: 80px;
-}
-
-.story-title {
-  font-size: 1.8rem;
-  color: #d1fae5;
-  margin-bottom: 20px;
+.cursor-halo{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:rgba(52,211,153,0.18);
+  border:1px solid rgba(110,231,183,0.35);
+  box-shadow:0 0 28px rgba(52,211,153,0.25);
 }
 
-.story-box {
-  background: linear-gradient(145deg, rgba(16, 185, 129, 0.08), rgba(0, 0, 0, 0.2));
-  border: 1px solid rgba(52, 211, 153, 0.25);
-  padding: 28px;
-  border-radius: 16px;
-  backdrop-filter: blur(8px);
-  transition: all 0.3s ease;
+@media (pointer:coarse){
+  .cursor-dot,
+  .cursor-halo{
+    display:none;
+  }
 }
 
-.story-box:hover {
-  transform: translateY(-4px);
-  border-color: #34d399;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+/* ===== LAYOUT ===== */
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:60px 20px 80px;
+  position:relative;
+  z-index:1;
 }
 
-.story-text {
-  margin-bottom: 16px;
-  color: #d1fae5;
-  font-size: 1.02rem;
-  line-height: 1.75;
+.section{
+  opacity:0;
+  transform:translateY(36px);
+  transition:opacity 0.85s ease, transform 0.85s ease;
 }
 
-.story-text:first-child {
-  font-size: 1.2rem;
-  color: #6ee7b7;
-  font-weight: 500;
+.section.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* ===== HERO ===== */
+.hero{
+  margin-bottom:20px;
+}
+
+h1{
+  font-size:2.8rem;
+  color:var(--white);
+  margin:0 0 8px 0;
+}
+
+.hero-subtitle{
+  margin:0 0 16px 0;
+  line-height:1.65;
+  color:var(--muted);
+  font-size:1.02rem;
+}
+
+.top-links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+}
+
+.top-links a{
+  color:var(--accent);
+  text-decoration:none;
+  font-weight:500;
+}
+
+.top-links a:hover{
+  color:var(--accent-soft);
+}
+
+/* ===== STORY STYLE APPLIED TO ALL SECTIONS ===== */
+.story-section{
+  margin-top:80px;
+}
+
+.story-title{
+  font-size:1.8rem;
+  color:#d1fae5;
+  margin:0 0 20px 0;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  padding-bottom:10px;
+}
+
+.story-box{
+  background:linear-gradient(145deg,var(--panel),var(--panel-dark));
+  border:1px solid var(--border);
+  padding:28px;
+  border-radius:16px;
+  backdrop-filter:blur(8px);
+  transition:all 0.3s ease;
+}
+
+.story-box:hover{
+  transform:translateY(-4px);
+  border-color:var(--accent);
+  box-shadow:var(--shadow);
+}
+
+.story-text{
+  margin:0 0 16px 0;
+  color:#d1fae5;
+  font-size:1.02rem;
+  line-height:1.8;
+}
+
+.story-text:last-child{
+  margin-bottom:0;
+}
+
+.story-text:first-child{
+  font-size:1.2rem;
+  color:var(--accent-soft);
+  font-weight:500;
+}
+
+/* ===== GRID / CARD SYSTEM ===== */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
+  gap:20px;
+}
+
+.card-item,
+a.card-item{
+  display:block;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border-soft);
+  padding:20px;
+  border-radius:14px;
+  transition:all 0.3s ease;
+  color:inherit;
+  text-decoration:none;
+  overflow:hidden;
+}
+
+.card-item:hover{
+  transform:scale(1.03);
+  border-color:var(--accent);
+  box-shadow:0 12px 30px rgba(0,0,0,0.28);
+}
+
+.card-title{
+  font-size:1.02rem;
+  line-height:1.45;
+  color:var(--white);
+  font-weight:600;
+  margin:0;
+}
+
+.card-meta{
+  margin-top:8px;
+  color:var(--accent-soft);
+  font-size:0.92rem;
+  line-height:1.5;
+}
+
+.card-submeta{
+  margin-top:4px;
+  color:#bde7da;
+  font-size:0.88rem;
+  line-height:1.5;
+}
+
+.card-body{
+  opacity:0;
+  max-height:0;
+  overflow:hidden;
+  transition:all 0.35s ease;
+  color:#d1fae5;
+}
+
+.card-item:hover .card-body{
+  opacity:1;
+  max-height:900px;
+  margin-top:14px;
+}
+
+.card-body p{
+  margin:0 0 12px 0;
+  line-height:1.75;
+}
+
+.card-body p:last-child{
+  margin-bottom:0;
+}
+
+.detail-list{
+  margin:0;
+  padding-left:18px;
+}
+
+.detail-list li{
+  margin-bottom:8px;
+  line-height:1.65;
+}
+
+.detail-list li:last-child{
+  margin-bottom:0;
+}
+
+/* ===== PUBLICATIONS ===== */
+.pub-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:20px;
+}
+
+.pub-card{
+  display:block;
+  text-decoration:none;
+  color:inherit;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border-soft);
+  padding:20px;
+  border-radius:14px;
+  transition:all 0.35s ease;
+  overflow:hidden;
+}
+
+.pub-card:hover{
+  transform:scale(1.03);
+  border-color:var(--accent);
+  box-shadow:0 12px 30px rgba(0,0,0,0.28);
+}
+
+.pub-title{
+  display:block;
+  color:var(--white);
+  font-size:1rem;
+  line-height:1.45;
+  font-weight:600;
+}
+
+.pub-meta{
+  margin-top:8px;
+  color:var(--accent-soft);
+  font-size:0.92rem;
+  line-height:1.55;
+}
+
+.pub-abstract{
+  opacity:0;
+  max-height:0;
+  overflow:hidden;
+  transition:all 0.35s ease;
+  margin:0;
+  color:#d1fae5;
+  line-height:1.75;
+}
+
+.pub-card:hover .pub-abstract{
+  opacity:1;
+  max-height:420px;
+  margin-top:14px;
+}
+
+/* ===== EDUCATION / CERTIFICATIONS COMPACT ===== */
+.compact-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:18px;
+}
+
+/* ===== SMALL POLISH ===== */
+hr.soft{
+  border:none;
+  border-top:1px solid rgba(255,255,255,0.08);
+  margin:24px 0;
 }
 </style>
 </head>
-
 <body>
 
-<div class="cursor"></div>
+<div class="cursor-dot"></div>
+<div class="cursor-halo"></div>
 
 <div class="container">
 
-<!-- HERO -->
-<section class="section">
-<h1>Swagat Das</h1>
-<p>PhD Student · Artificial Intelligence · Cyber-Physical Systems · Self-Supervised Learning · Power & Energy</p>
+  <!-- HERO -->
+  <section class="section hero">
+    <h1>Swagat Das</h1>
+    <p class="hero-subtitle">PhD Student · Artificial Intelligence · Cyber-Physical Systems · Self-Supervised Learning · Power &amp; Energy</p>
+    <div class="top-links">
+      <a href="https://scholar.google.com/citations?user=_X50sTMAAAAJ" target="_blank" rel="noopener noreferrer">Scholar</a>
+      <a href="https://www.linkedin.com/in/swagat-das/?skipRedirect=true" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a href="https://www.researchgate.net/profile/Swagat-Das" target="_blank" rel="noopener noreferrer">ResearchGate</a>
+      <a href="https://orcid.org/0000-0003-2263-0217" target="_blank" rel="noopener noreferrer">ORCID</a>
+    </div>
+  </section>
 
-<p>
-<a href="https://scholar.google.com">Scholar</a> · 
-<a href="https://linkedin.com">LinkedIn</a> · 
-<a href="https://researchgate.net">ResearchGate</a> · 
-<a href="https://orcid.org">ORCID</a>
-</p>
-</section>
+  <!-- MY STORY -->
+  <section class="section story-section">
+    <h2 class="story-title">My Story</h2>
+    <div class="story-box">
+      <p class="story-text">Most work in artificial intelligence begins in controlled settings. Mine did not.</p>
 
-<!-- ABOUT -->
-<section class="section story-section">
+      <p class="story-text">I started in electrical engineering and energy systems, working with real infrastructure where things rarely behave the way theory suggests. Spending years teaching, building labs, and working hands on with these systems shaped how I think about problems today. If something does not hold up outside the lab, it is not finished.</p>
 
-<h2 class="story-title">My Story</h2>
+      <p class="story-text">That perspective now drives my work as a PhD student at Virginia Commonwealth University. My research sits at the intersection of artificial intelligence and cyber physical systems, covering self supervised learning, anomaly detection, and perception tasks such as image segmentation, object detection, and multimodal data across street view, aerial, and LiDAR in both 2D and 3D. The goal is simple. Build systems that remain reliable when the data is messy, incomplete, and constantly changing.</p>
 
-<div class="story-box">
+      <p class="story-text">More recently, I have been working on agentic LLM based cybersecurity systems for smart manufacturing environments. The focus is on building systems that can reason, adapt, and interact with complex industrial processes rather than just analyze them.</p>
 
-<p class="story-text">
-Most work in artificial intelligence begins in controlled settings. Mine did not.
-</p>
+      <p class="story-text">I tend to work in a hands on, systems driven way. That means building pipelines, working with large imperfect datasets, and pushing ideas all the way toward something that can actually be deployed and trusted.</p>
 
-<p class="story-text">
-I started in electrical engineering and energy systems, working with real infrastructure where things rarely behave the way theory suggests. Spending years teaching, building labs, and working hands on with these systems shaped how I think about problems today. If something does not hold up outside the lab, it is not finished.
-</p>
+      <p class="story-text">Before this, I spent several years as an Assistant Professor, along with serving as Assistant Director for Quality Assurance. During that time, I worked on improving academic processes, strengthening accreditation outcomes, and contributing to the university’s performance across national and international ranking frameworks.</p>
 
-<p class="story-text">
-That perspective now drives my work as a PhD student at Virginia Commonwealth University. My research sits at the intersection of artificial intelligence and cyber physical systems, covering self supervised learning, anomaly detection, and perception tasks such as image segmentation, object detection, and multimodal data across street view, aerial, and LiDAR in both 2D and 3D. The goal is simple. Build systems that remain reliable when the data is messy, incomplete, and constantly changing.
-</p>
+      <p class="story-text">Outside research, I enjoy a different kind of problem solving. Sports and sports analytics, traveling, trying new cuisines, and meeting people from different backgrounds are all part of how I stay curious. Those experiences often shape how I approach systems, decisions, and impact.</p>
+    </div>
+  </section>
 
-<p class="story-text">
-More recently, I have been working on agentic LLM based cybersecurity systems for smart manufacturing environments. The focus is on building systems that can reason, adapt, and interact with complex industrial processes rather than just analyze them.
-</p>
+  <!-- PROJECTS -->
+  <section class="section story-section">
+    <h2 class="story-title">Projects</h2>
+    <div class="story-box">
+      <div class="grid">
 
-<p class="story-text">
-I tend to work in a hands on, systems driven way. That means building pipelines, working with large imperfect datasets, and pushing ideas all the way toward something that can actually be deployed and trusted.
-</p>
+        <div class="card-item">
+          <h3 class="card-title">Large-Scale Aerial LiDAR Data Semantic Segmentation</h3>
+          <div class="card-meta">Jan 2025 – Present</div>
+          <div class="card-submeta">Virginia Commonwealth University · In collaboration with VIPC and Timmons Group</div>
+          <div class="card-body">
+            <p>This project focuses on designing scalable deep learning pipelines for semantic segmentation of large-scale aerial LiDAR point clouds for real-world remote sensing and geospatial applications.</p>
+            <ul class="detail-list">
+              <li>Designed end to end workflows for cleaning, preprocessing, and semantically segmenting large 3D point clouds into multiple terrain and object classes.</li>
+              <li>Built scalable data handling pipelines for high-volume LiDAR ingestion, storage, and I/O optimization on HPC and parallel file systems.</li>
+              <li>Implemented training and inference optimizations including distributed batching, mixed precision training, and filesystem-aware data loading.</li>
+              <li>Addressed class imbalance with sampling strategies, loss re-weighting, and hard example mining.</li>
+              <li>Studied generalization across sensors, regions, and acquisition conditions through cross-dataset validation.</li>
+              <li>Established a production-grade stack covering ETL, model training, inference, and evaluation.</li>
+            </ul>
+          </div>
+        </div>
 
-<p class="story-text">
-Before this, I spent several years as an Assistant Professor, along with serving as Assistant Director for Quality Assurance. During that time, I worked on improving academic processes, strengthening accreditation outcomes, and contributing to the university’s performance across national and international ranking frameworks.
-</p>
+        <div class="card-item">
+          <h3 class="card-title">Electric Vehicle Integrated Safety, Intelligence, and OperatioNs (eVISION)</h3>
+          <div class="card-meta">Jan 2025 – Sep 2025</div>
+          <div class="card-submeta">Virginia Commonwealth University · In collaboration with Idaho National Laboratory and the U.S. Department of Energy</div>
+          <div class="card-body">
+            <p>eVISION is a multi-institutional R&amp;D initiative aimed at improving the reliability, observability, and operational resilience of EV charging infrastructure across the United States.</p>
+            <ul class="detail-list">
+              <li>Built scalable pipelines aggregating around one million EV charging sessions into weekly state, city, and charger-level features.</li>
+              <li>Designed a unified charger health score from availability, failures, retries, and utilization with tunable weighting and temporal decay.</li>
+              <li>Implemented short-term health forecasting using a Graph-Time Transformer that captures spatial dependencies across cities.</li>
+              <li>Integrated weather and geospatial features such as temperature, precipitation, humidity, and elevation.</li>
+              <li>Co-developed an interactive Dash and Mapbox platform with drilldowns, KPI cards, trend views, forecast toggles, and diagnostics.</li>
+              <li>Improved responsiveness using Dask-based parallelization, caching, and a decoupled UI/backend design.</li>
+            </ul>
+          </div>
+        </div>
 
-<p class="story-text">
-Outside research, I enjoy a different kind of problem solving. Sports and sports analytics, traveling, trying new cuisines, and meeting people from different backgrounds are all part of how I stay curious. Those experiences often shape how I approach systems, decisions, and impact.
-</p>
+        <div class="card-item">
+          <h3 class="card-title">Agentic LLM Cybersecurity for Smart Manufacturing</h3>
+          <div class="card-meta">Current research direction</div>
+          <div class="card-submeta">Industrial cybersecurity · Smart manufacturing</div>
+          <div class="card-body">
+            <p>This work explores agentic LLM systems for cybersecurity in industrial and manufacturing environments, with a focus on intelligent reasoning, tool use, and adaptive workflows.</p>
+            <ul class="detail-list">
+              <li>Studying how language-model agents can reason over industrial context, cyber events, and operational constraints.</li>
+              <li>Building workflows around memory, retrieval, tool integration, and decision support for manufacturing security operations.</li>
+              <li>Interested in moving beyond static analysis toward systems that can interact with complex industrial processes in a controlled way.</li>
+            </ul>
+          </div>
+        </div>
 
-</div>
+        <div class="card-item">
+          <h3 class="card-title">AI-Based ECG Diagnostic Pipeline</h3>
+          <div class="card-meta">Current research effort</div>
+          <div class="card-submeta">Deep learning · Biomedical anomaly detection</div>
+          <div class="card-body">
+            <p>Designed an AI-based diagnostic pipeline for early-stage ECG image classification and anomaly detection.</p>
+            <ul class="detail-list">
+              <li>Combines Neural Style Transfer with self supervised learning techniques.</li>
+              <li>Includes deep architecture design, pretext task development, and optimization using PyTorch and TensorFlow.</li>
+            </ul>
+          </div>
+        </div>
 
-</section>
+        <div class="card-item">
+          <h3 class="card-title">Graduate Project for Power Electronics in Utility Applications Course</h3>
+          <div class="card-meta">Aug 2016 – Dec 2016</div>
+          <div class="card-submeta">University of Missouri–Kansas City</div>
+          <div class="card-body">
+            <ul class="detail-list">
+              <li>Designed and analyzed different Space Vector Modulation schemes for a 3-phase power converter using MATLAB and Simulink.</li>
+              <li>Compared the schemes in terms of Total Harmonic Distortion, peak-to-peak ripple at Imax, and switching states per switching period.</li>
+            </ul>
+          </div>
+        </div>
 
-<!-- PROJECTS -->
-<section class="section">
-<h2>Projects</h2>
+        <div class="card-item">
+          <h3 class="card-title">Graduate Project on Advanced Substation Design</h3>
+          <div class="card-meta">Aug 2015 – Dec 2015</div>
+          <div class="card-submeta">University of Missouri–Kansas City</div>
+          <div class="card-body">
+            <ul class="detail-list">
+              <li>Reviewed and compared substation components and bus bar configurations.</li>
+              <li>Studied how future systems can improve flexibility, communication with loads, and reliability in the smart grid era.</li>
+            </ul>
+          </div>
+        </div>
 
-<div class="grid">
+        <div class="card-item">
+          <h3 class="card-title">Modelling of Smart Distribution Network using OpenDSS</h3>
+          <div class="card-meta">May 2015 – Dec 2015</div>
+          <div class="card-submeta">University of Missouri–Kansas City</div>
+          <div class="card-body">
+            <ul class="detail-list">
+              <li>Graduate project for Smart Grid coursework.</li>
+              <li>Worked on OpenDSS modeling requirements and challenges for smart distribution networks.</li>
+              <li>Built basic MV and LV network models and interfaced OpenDSS with Excel VBA and MATLAB.</li>
+            </ul>
+          </div>
+        </div>
 
-<div class="card">
-<strong>Large-Scale Aerial LiDAR Segmentation</strong>
-<p>
-Designed scalable deep learning pipelines for semantic segmentation of aerial LiDAR point clouds. Addressed domain shift, class imbalance, and large-scale training using HPC infrastructure. Developed production-ready workflows from data ingestion to model deployment.
-</p>
-</div>
+        <div class="card-item">
+          <h3 class="card-title">Filter Design for Power Quality Improvement</h3>
+          <div class="card-meta">Jan 2015 – May 2015</div>
+          <div class="card-submeta">University of Missouri–Kansas City</div>
+          <div class="card-body">
+            <ul class="detail-list">
+              <li>Assessed power quality problems in an electric power system.</li>
+              <li>Designed a passive filter in PSCAD to reduce THDv to a level compliant with IEEE-519.</li>
+            </ul>
+          </div>
+        </div>
 
-<div class="card">
-<strong>eVISION EV Health Platform</strong>
-<p>
-Developed a large-scale analytics system for EV charger health monitoring using ~1M sessions. Built Graph-Time Transformer models for forecasting and a geospatial dashboard using Dash and Mapbox.
-</p>
-</div>
+        <div class="card-item">
+          <h3 class="card-title">Grid Interactive PV System Modelling for Miller Nichols Library</h3>
+          <div class="card-meta">Jan 2015 – May 2015</div>
+          <div class="card-submeta">University of Missouri–Kansas City</div>
+          <div class="card-body">
+            <ul class="detail-list">
+              <li>Designed a 480 kW grid-interactive solar installation for the library building with a future expansion margin of 15%.</li>
+              <li>Used Helioscope for design simulation and SAM-PV for economic analysis.</li>
+            </ul>
+          </div>
+        </div>
 
-</div>
-</section>
+      </div>
+    </div>
+  </section>
 
-<!-- PUBLICATIONS -->
-<section class="section">
-<h2>Publications</h2>
+  <!-- PUBLICATIONS -->
+  <section class="section story-section">
+    <h2 class="story-title">Publications</h2>
+    <div class="story-box">
+      <div class="pub-grid">
 
-<div class="grid">
+        <a class="pub-card" href="https://www.researchgate.net/publication/394432500_Learning_Beyond_Labels_Self-Supervised_Methods_for_Anomaly_Detection_in_Cyber-Physical_Systems" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">Learning Beyond Labels: Self-Supervised Methods for Anomaly Detection in Cyber-Physical Systems</span>
+          <div class="pub-meta">51st Annual Conference of the IEEE Industrial Electronics Society (IECON) · 2025</div>
+          <p class="pub-abstract">A survey of recent self supervised learning methods for anomaly detection in cyber physical systems, organized across contrastive, reconstructive, predictive, and joint embedding paradigms. It also benchmarks 29 methods across CPS datasets and highlights emerging JEPA-style approaches and key deployment challenges.</p>
+        </a>
 
-<div class="card">
-<a href="#" target="_blank">
-<strong>Learning Beyond Labels – IECON 2025</strong>
-<p>Comprehensive survey of self-supervised learning methods for anomaly detection in cyber-physical systems.</p>
-</a>
-</div>
+        <a class="pub-card" href="https://www.researchgate.net/publication/394432431_KPU-Net_Kernal_Point_Unet_for_3D_LiDAR_Ground_Segmentation" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">KPU-Net: Kernal Point Unet for 3D LiDAR Ground Segmentation</span>
+          <div class="pub-meta">51st Annual Conference of the IEEE Industrial Electronics Society (IECON) · 2025</div>
+          <p class="pub-abstract">Introduces KPU-Net, a KPConv-augmented U-Net architecture for robust LiDAR ground segmentation under geometric distortion, occlusion, clutter, and irregular terrain. The work emphasizes both segmentation accuracy and scalable processing for mapping and perception systems.</p>
+        </a>
 
-<div class="card">
-<a href="#" target="_blank">
-<strong>KPU-Net – IECON 2025</strong>
-<p>LiDAR segmentation architecture using KPConv and U-Net for improved accuracy and scalability.</p>
-</a>
-</div>
+        <a class="pub-card" href="https://www.researchgate.net/publication/390805968_GAP-CAN_Gradient-Based_Adversarial_Attack_on_Transformers_for_CAN_Bus_Anomaly_Detection" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">GAP-CAN: Gradient-Based Adversarial Attack on Transformers for CAN Bus Anomaly Detection</span>
+          <div class="pub-meta">2025 IEEE 8th International Conference on Industrial Cyber-Physical Systems (ICPS) · 2025</div>
+          <p class="pub-abstract">Studies the robustness limits of transformer-based CAN bus anomaly detectors by generating adversarial examples through a gradient-based search strategy adapted for tokenized sequence inputs. The work shows that high-accuracy detection models can still be vulnerable under adversarial perturbation.</p>
+        </a>
 
-<div class="card">
-<a href="#" target="_blank">
-<strong>GAP-CAN – ICPS 2025</strong>
-<p>Adversarial attack framework for transformer-based CAN bus anomaly detection.</p>
-</a>
-</div>
+        <a class="pub-card" href="https://www.researchgate.net/publication/378326144_A_Single-Source-Based_13-Level_Switched_Capacitor_Multilevel_Inverter_with_Reduced_Components" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">A Single-Source-Based 13-Level Switched Capacitor Multilevel Inverter with Reduced Components</span>
+          <div class="pub-meta">2023 IEEE 3rd International Conference on Smart Technologies for Power, Energy and Control (STPEC) · 2023</div>
+          <p class="pub-abstract">Proposes a switched-capacitor multilevel inverter topology that achieves 13 output levels from a single source while reducing component count. The design targets voltage boosting, self-balancing behavior, and improved efficiency for renewable and power-electronic applications.</p>
+        </a>
 
-<!-- ADD REMAINING PAPERS SAME FORMAT -->
+        <a class="pub-card" href="https://www.researchgate.net/publication/366577466_REVIEW_OF_FAULTS_IN_TRANSFORMERS" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">REVIEW OF FAULTS IN TRANSFORMERS</span>
+          <div class="pub-meta">International Journal of Engineering Applied Sciences and Technology · 2022</div>
+          <p class="pub-abstract">A concise review that classifies major transformer disturbances and faults together with their protection schemes. The paper focuses on fault categories, diagnostic understanding, and their implications for transformer reliability and protection.</p>
+        </a>
 
-</div>
-</section>
+        <a class="pub-card" href="https://www.researchgate.net/publication/364825786_Identification_of_the_Dominant_Harmonic_Source_Type_in_the_Distribution_Network_Using_the_Soft_Computing_Technique" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">Identification of the Dominant Harmonic Source Type in the Distribution Network Using the Soft Computing Technique</span>
+          <div class="pub-meta">International Transactions on Electrical Energy Systems (Hindawi) · 2022</div>
+          <p class="pub-abstract">Presents a wavelet-based soft-computing method for identifying harmonic source position and characteristics in distribution systems. The method reduces computational burden while improving localization of harmonic-generating sources.</p>
+        </a>
 
-<!-- PATENTS -->
-<section class="section">
-<h2>Patents</h2>
+        <a class="pub-card" href="https://www.researchgate.net/publication/360092261_GaN-based_isolated_bi-directional_DC-DC_converter_for_high_load_current_application" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">GaN-based isolated bi-directional DC-DC converter for high load current application</span>
+          <div class="pub-meta">2022 IEEE Delhi Section Conference (DELCON) · 2022</div>
+          <p class="pub-abstract">Explores a GaN HEMT based isolated bidirectional Dual Active Bridge DC-DC converter operated under single-phase-shift control. The work compares GaN and Si implementations for power level, output behavior, and efficiency in high-current applications.</p>
+        </a>
 
-<div class="grid">
+        <a class="pub-card" href="https://www.researchgate.net/publication/351573219_Status_of_energy_in_Syria_-_Study_on_how_to_meet_the_energy_shortage_by_means_of_renewable_resources" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">Status of energy in Syria - Study on how to meet the energy shortage by means of renewable resources</span>
+          <div class="pub-meta">IEEE IREC · 2021</div>
+          <p class="pub-abstract">Examines the Syrian energy sector before and after conflict and evaluates renewable resources as a pathway to close the energy deficit. The paper connects solar and wind potential to reconstruction-era planning and future smart-grid adoption.</p>
+        </a>
 
-<div class="card">
-<strong>Edge Computing-Based Fault Detection for DG Units</strong>
-<p>
-Proposes an edge-based architecture for real-time detection and localization of faults in distributed generation systems within power distribution networks, enabling faster response and improved system resilience.
-</p>
-</div>
+        <a class="pub-card" href="https://www.researchgate.net/publication/348217909_A_Novel_Single-Phase_Switched_Capacitor_Multilevel_Inverter_with_Voltage_Boosting_Ability_for_Renewable_Applications" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">A Novel Single-Phase Switched Capacitor Multilevel Inverter with Voltage Boosting Ability for Renewable Applications</span>
+          <div class="pub-meta">Advances in Smart Grid and Renewable Energy · 2021</div>
+          <p class="pub-abstract">Introduces a 19-level switched-capacitor inverter topology with voltage boosting and self-balancing capability while reducing cost and hardware burden. The work emphasizes performance benefits for renewable energy applications.</p>
+        </a>
 
-<div class="card">
-<strong>IoT-Based Data Acquisition Server Machine</strong>
-<p>
-Developed a scalable IoT framework for real-time data acquisition and monitoring across distributed systems, supporting integration with analytics and control platforms.
-</p>
-</div>
+        <a class="pub-card" href="https://www.researchgate.net/publication/348218400_DGA_and_AI_Technique_for_Fault_Diagnosis_in_Distribution_Transformer" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">DGA and AI Technique for Fault Diagnosis in Distribution Transformer</span>
+          <div class="pub-meta">Advances in Smart Grid and Renewable Energy · 2021</div>
+          <p class="pub-abstract">Uses dissolved gas analysis with support vector machines and binary decision trees for transformer fault prediction. The work compares AI-based diagnosis against conventional methods and highlights improved fault classification accuracy.</p>
+        </a>
 
-</div>
-</section>
+        <a class="pub-card" href="https://www.researchgate.net/publication/346640269_Performance_Evaluation_of_PV-SOFC_Grid_Integrated_3P3W_System_by_UPQC_with_Sinusoidal_Current_Control_Strategy_at_Constant_Irradiance" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">Performance Evaluation of PV-SOFC Grid Integrated 3P3W System by UPQC with Sinusoidal Current Control Strategy at Constant Irradiance</span>
+          <div class="pub-meta">IEEE HYDCON · 2020</div>
+          <p class="pub-abstract">Evaluates power-quality improvement in a PV-SOFC integrated grid system using a Unified Power Quality Conditioner and sinusoidal current control. The study analyzes mitigation of harmonics and power-quality disturbances under constant irradiance.</p>
+        </a>
 
-<!-- EXPERIENCE -->
-<section class="section">
-<h2>Experience</h2>
+        <a class="pub-card" href="https://www.researchgate.net/publication/339094894_Emerging_trends_in_Electric_Vehicle_in_Indian_market" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">Emerging trends in Electric Vehicle in Indian market</span>
+          <div class="pub-meta">IEEE RDCAPE · 2020</div>
+          <p class="pub-abstract">Reviews EV market trends in India, charging infrastructure, and regulatory context, and proposes an economic model for EV charging deployment in commercial settings. The work aims to support practical EV infrastructure planning.</p>
+        </a>
 
-<div class="grid">
+        <a class="pub-card" href="https://www.researchgate.net/publication/332679024_Arduino_based_Safety_Device_for_the_Visually_Challenged" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">Arduino based Safety Device for the Visually Challenged</span>
+          <div class="pub-meta">2019 International Conference on Communication and Signal Processing (ICCSP) · 2019</div>
+          <p class="pub-abstract">Presents a wearable obstacle-detection device using ultrasonic sensing, audio beeps, and vibration feedback to support safer mobility for visually impaired users. The design focuses on low cost, accessibility, and practical usability.</p>
+        </a>
 
-<div class="card">
-<strong>Research Assistant – VCU</strong>
-<p>
-Working on EV infrastructure analytics, CPS datasets, time-series forecasting, and scalable MLOps pipelines integrating real-time environmental and geospatial data.
-</p>
-</div>
+        <!-- Fallback link: exact public RG / IEEE landing page for this older AESPC paper was not directly retrievable from accessible sources -->
+        <a class="pub-card" href="https://scholar.google.com/citations?user=_X50sTMAAAAJ&hl=en" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">Modelling of Photovoltaic Faults Due to Shading</span>
+          <div class="pub-meta">IEEE International Conference on Applied Electromagnetics, Signal Processing &amp; Communication (AESPC) · 2018</div>
+          <p class="pub-abstract">Discusses classifications of photovoltaic shading faults and models their electrical characteristics in MATLAB. The work uses output plots to better understand shading-related behavior and fault detection implications in PV systems.</p>
+        </a>
 
-<div class="card">
-<strong>Assistant Professor – KIIT</strong>
-<p>
-Delivered courses in power systems, renewable energy, IoT, and energy storage. Established labs, developed curriculum, and mentored students across programs.
-</p>
-</div>
+        <a class="pub-card" href="https://www.researchgate.net/publication/339555888_Fast_charging_a_12V_battery_using_wireless_power_transfer_concept" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">Fast charging a 12V battery using wireless power transfer concept</span>
+          <div class="pub-meta">IEEE ICRIEECE · 2018</div>
+          <p class="pub-abstract">Combines wireless power transfer and fast charging concepts for a 12V battery charging setup. The paper studies short-range inductive transfer and fast-charging circuitry with applications extending to EVs and biomedical devices.</p>
+        </a>
 
-</div>
-</section>
+        <a class="pub-card" href="https://www.researchgate.net/publication/328837162_Classification_of_Different_Types_of_Faults_in_a_Photovoltaic_System" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">Classification of Different Types of Faults in a Photovoltaic System</span>
+          <div class="pub-meta">IEEE ICCPEIC · 2018</div>
+          <p class="pub-abstract">Classifies major AC- and DC-side faults in photovoltaic systems and discusses their impact on safety, reliability, and performance. The work also includes simulation modeling for partial shading and MPPT-related behavior.</p>
+        </a>
 
-<!-- EDUCATION -->
-<section class="section">
-<h2>Education</h2>
+        <a class="pub-card" href="https://www.researchgate.net/publication/324614165_Active_power_cycling_and_condition_monitoring_of_IGBT_power_modules_using_reflectometry" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">Active power cycling and condition monitoring of IGBT power modules using reflectometry</span>
+          <div class="pub-meta">IEEE Applied Power Electronics Conference and Exposition (APEC) · 2018</div>
+          <p class="pub-abstract">Studies active power cycling and health monitoring of IGBT power modules through reflectometry-based measurements. The work contributes to condition monitoring approaches for high-power electronic switching devices under aging stress.</p>
+        </a>
 
-<p>
-<strong>PhD – Computer Science</strong><br>
-Virginia Commonwealth University<br>
-Relevant coursework: Machine Learning, Deep Learning, Data Mining, Advanced Algorithms
-</p>
+        <a class="pub-card" href="https://www.researchgate.net/publication/317072342_Detection_of_aging_related_IGBT_bond-wire_lift-off_using_spread_spectrum_time_domain_reflectometry_SSTDR" target="_blank" rel="noopener noreferrer">
+          <span class="pub-title">Detection of aging related IGBT bond-wire lift-off using spread spectrum time domain reflectometry (SSTDR)</span>
+          <div class="pub-meta">IEEE Applied Power Electronics Conference and Exposition (APEC) · 2017</div>
+          <p class="pub-abstract">Introduces an SSTDR-based technique for detecting bond-wire lift-off in large IGBT modules while they remain in operation. The method links correlated signal changes to aging-related degradation and supports online health assessment.</p>
+        </a>
 
-<p>
-<strong>MS – Electrical Engineering</strong><br>
-University of Missouri–Kansas City<br>
-Relevant coursework: Power Systems, Control Systems, Embedded Systems
-</p>
+      </div>
+    </div>
+  </section>
 
-<p>
-<strong>BTech – Electrical Engineering</strong><br>
-KIIT University<br>
-Relevant coursework: Circuit Theory, Power Electronics, Electrical Machines
-</p>
+  <!-- PATENTS -->
+  <section class="section story-section">
+    <h2 class="story-title">Patents</h2>
+    <div class="story-box">
+      <div class="grid">
 
-</section>
+        <a class="card-item" href="https://www.researchgate.net/publication/400315202_An_Edge_Computing-Based_Fault_Detection_and_Localization_for_Intelligent_DG_Unit_Disconnection_in_Power_Distribution_Networks" target="_blank" rel="noopener noreferrer">
+          <h3 class="card-title">An Edge Computing–Based Fault Detection and Localization for Intelligent DG Unit Disconnection in Power Distribution Networks</h3>
+          <div class="card-meta">Patent · May 2024</div>
+          <div class="card-submeta">Pampa Sinha · Swagat Das · Chitralekha Jena</div>
+          <div class="card-body">
+            <p>This invention addresses stability challenges caused by integrating distributed generation units such as solar and wind into modern power grids.</p>
+            <ul class="detail-list">
+              <li>Proposes a decentralized edge-cloud framework instead of relying only on latency-prone centralized SCADA control.</li>
+              <li>Targets faster fault detection, more localized fault response, and intelligent DG disconnection during disturbances.</li>
+              <li>Designed for scalability and resilience in future distribution networks with growing renewable penetration.</li>
+            </ul>
+          </div>
+        </a>
+
+        <a class="card-item" href="https://www.researchgate.net/publication/400315523_IoT-Based_Data_Acquisition_Server_Machine" target="_blank" rel="noopener noreferrer">
+          <h3 class="card-title">IoT-Based Data Acquisition Server Machine</h3>
+          <div class="card-meta">Patent · January 2024</div>
+          <div class="card-submeta">Swagat Das</div>
+          <div class="card-body">
+            <p>This design patent covers the structural and aesthetic design of an IoT-based data acquisition server machine for reliable collection, aggregation, and transmission of sensor data.</p>
+            <ul class="detail-list">
+              <li>Emphasizes compact form factor, modularity, and deployment suitability across industrial and smart infrastructure settings.</li>
+              <li>Supports real-time monitoring and integration with broader sensing and analytics pipelines.</li>
+              <li>Aligned with practical IoT deployment needs in distributed environments.</li>
+            </ul>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="section story-section">
+    <h2 class="story-title">Experience</h2>
+    <div class="story-box">
+      <div class="grid">
+
+        <div class="card-item">
+          <h3 class="card-title">Research Assistant</h3>
+          <div class="card-meta">Virginia Commonwealth University · Jan 2025 – Present</div>
+          <div class="card-submeta">Richmond, Virginia, United States · On-site</div>
+          <div class="card-body">
+            <ul class="detail-list">
+              <li>Contributing to a collaborative project with a U.S. national lab to build a real-time EV charger health monitoring dashboard using Dash, cuDF, Dask, and Mapbox.</li>
+              <li>Assisting in time-series forecasting for charger health and utilization using temperature, traffic, road, and operational data.</li>
+              <li>Working extensively with CPS datasets, real-time traffic feeds, and historical weather data.</li>
+              <li>Building ETL and feature engineering workflows in Python, Pandas, and NumPy for predictive modeling and anomaly detection.</li>
+              <li>Applying MLOps practices for reproducibility, scalable deployment, and version control.</li>
+              <li>Also developing an AI-based ECG image pipeline that combines Neural Style Transfer with self supervised learning.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">Assistant Director – Quality Assurance</h3>
+          <div class="card-meta">KiiT University · Sep 2022 – Dec 2024</div>
+          <div class="card-submeta">Academic administration · Accreditation · Rankings</div>
+          <div class="card-body">
+            <ul class="detail-list">
+              <li>Developed and implemented quality assurance policies and procedures.</li>
+              <li>Conducted internal audits to support accreditation compliance and academic quality improvement.</li>
+              <li>Monitored academic program effectiveness, student outcomes, and assessment systems.</li>
+              <li>Created reports on academic performance and quality assurance metrics.</li>
+              <li>Worked with accreditation bodies and contributed to reviews involving NBA, NAAC, ABET, IET, NIRF, THE, QS, and Shanghai rankings.</li>
+              <li>Helped improve the university’s academic processes as well as its performance across internal and external domestic and international ranking frameworks.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">Assistant Professor</h3>
+          <div class="card-meta">KiiT University · Aug 2017 – Dec 2024</div>
+          <div class="card-submeta">Bhubaneshwar, Odisha, India</div>
+          <div class="card-body">
+            <ul class="detail-list">
+              <li>Set up an Industrial Automation academic and research laboratory in collaboration with Schneider Electric and Siemens, with equipment worth 15 Million INR.</li>
+              <li>Set up an automated printed circuit board manufacturing and assembly line worth 7.5 Million INR for research and industrial consultancy.</li>
+              <li>Served on the Industry-Institute Interfacing Committee and Training &amp; Placement Cell.</li>
+              <li>Acted as faculty-in-charge for over 800 international students from more than 45 countries.</li>
+              <li>Contributed to the university’s ABET, IET, and NBA accreditation activities.</li>
+              <li>Taught Power Station Engineering, Power Electronics, Switch Gear and Protection, Electrical Machines, Basic Electrical Engineering, Energy Storage Technology, Solar PV System Design, Internet of Things, and Energy Audit &amp; Management.</li>
+              <li>Worked as course coordinator and developer for multiple courses including Solar PV System Design, Advanced Power Electronics, Energy Storage Technology, and Electrical Special Machines.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">Faculty-in-charge (International Students)</h3>
+          <div class="card-meta">KiiT University · Aug 2018 – Dec 2023</div>
+          <div class="card-submeta">Student support · International programs</div>
+          <div class="card-body">
+            <ul class="detail-list">
+              <li>Guided international students on academic, social, and personal needs.</li>
+              <li>Helped promote the institution to prospective international students through fairs, partners, and outreach activities.</li>
+              <li>Planned and implemented orientation programs covering campus culture, academic programs, and student services.</li>
+              <li>Supported visa-related compliance, record updates, and coordination with relevant agencies.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">Graduate Research Assistant</h3>
+          <div class="card-meta">University of Missouri–Kansas City · Jan 2016 – Jul 2017</div>
+          <div class="card-submeta">Kansas City Metropolitan Area</div>
+          <div class="card-body">
+            <ul class="detail-list">
+              <li>Worked on aging and failure mechanisms of insulated-gate bipolar transistors and reflectometry-based fault detection methods in electrical transmission systems.</li>
+              <li>Built an aging station for accelerated aging of power semiconductor devices.</li>
+              <li>Modeled and analyzed high- and low-power circuits using MATLAB, Simulink, PSpice, and LabVIEW.</li>
+              <li>Performed finite element analysis in ANSYS and designed gate-driver PCBs for IGBT systems.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">Graduate Teaching Assistant</h3>
+          <div class="card-meta">University of Missouri–Kansas City · Jan 2016 – May 2016</div>
+          <div class="card-submeta">Circuit Theory I Lab</div>
+          <div class="card-body">
+            <ul class="detail-list">
+              <li>Introduced students to electrical testing and measurement instruments, laboratory safety, experimental techniques, and data interpretation.</li>
+              <li>Supported laboratory work tied to theoretical concepts from Circuit Theory coursework.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">Trainee</h3>
+          <div class="card-meta">ALFA Transformer · Dec 2012 – Jan 2013</div>
+          <div class="card-submeta">Bhubaneswar, India</div>
+          <div class="card-body">
+            <ul class="detail-list">
+              <li>Prepared daily reports covering design, manufacturing, and testing of distribution and power transformers.</li>
+              <li>Worked across transformer ranges from small pole-mounted distribution units to larger power transformers.</li>
+              <li>Gained practical understanding of transformer production workflows and industrial documentation.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">Electrical Engineer Intern</h3>
+          <div class="card-meta">Orissa Power Transmission Corporation Limited · May 2012 – Jul 2012</div>
+          <div class="card-submeta">Bhubaneswar, India</div>
+          <div class="card-body">
+            <ul class="detail-list">
+              <li>Received hands-on exposure to substations, transformers, CTs, PTs, circuit breakers, insulators, auxiliary systems, transmission lines, and protection schemes.</li>
+              <li>Worked with topics including transformer oil, DGA, fire safety, cabling, and maintenance practices for major electrical assets.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section class="section story-section">
+    <h2 class="story-title">Education</h2>
+    <div class="story-box">
+      <div class="compact-grid">
+
+        <div class="card-item">
+          <h3 class="card-title">Doctor of Philosophy, Computer Science</h3>
+          <div class="card-meta">Virginia Commonwealth University · Jan 2025 – Present</div>
+          <div class="card-submeta">Field of study: AI/ML and Cybersecurity</div>
+          <div class="card-body">
+            <p>Current doctoral work focused on artificial intelligence, cybersecurity, and resilient cyber physical systems.</p>
+            <p>Selected coursework: Machine Learning, Deep Learning, Data Mining, Advanced Algorithms.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">Master of Science, Electrical Engineering</h3>
+          <div class="card-meta">University of Missouri–Kansas City · 2014 – 2016</div>
+          <div class="card-submeta">Field of study: Electrical Engineering (Power &amp; Energy)</div>
+          <div class="card-body">
+            <p>Graduate work centered on power electronics, power systems, and energy applications.</p>
+            <p>Selected coursework: Power Systems, Control Systems, Embedded Systems.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">Bachelor of Technology, Electrical Engineering</h3>
+          <div class="card-meta">KIIT – Kalinga Institute of Industrial Technology · 2010 – 2014</div>
+          <div class="card-submeta">Field of study: Electrical Engineering</div>
+          <div class="card-body">
+            <p>Undergraduate training in electrical engineering fundamentals with early exposure to power systems and applied engineering design.</p>
+            <p>Selected coursework: Circuit Theory, Power Electronics, Electrical Machines.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CERTIFICATIONS -->
+  <section class="section story-section">
+    <h2 class="story-title">Licenses &amp; Certifications</h2>
+    <div class="story-box">
+      <div class="compact-grid">
+
+        <div class="card-item">
+          <h3 class="card-title">IIoT World Energy Day 2026 – Certificate of Attendance</h3>
+          <div class="card-meta">IIoT World · Issued Mar 2026</div>
+          <div class="card-body">
+            <p>Focused on Industrial AI and Smart Energy Systems, including edge solutions, virtual power plants, AI load challenges, and infrastructure resilience.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">Neuro-symbolic AI: The Third Wave of AI</h3>
+          <div class="card-meta">IEEE Industrial Electronics Society · Issued Sep 2025</div>
+          <div class="card-body">
+            <p>Professional development focused on neuro-symbolic AI and the broader evolution of intelligent systems.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">2025 National Security Collegiate Academy</h3>
+          <div class="card-meta">Federal Bureau of Investigation · Issued Apr 2025</div>
+          <div class="card-body">
+            <p>Exposure to national security, cybersecurity, and federal law enforcement perspectives.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">AI Frontiers 2025: Driving the Next Revolution in Smart Manufacturing</h3>
+          <div class="card-meta">IIoT World · Issued Sep 2025</div>
+          <div class="card-body">
+            <p>Focused on smart manufacturing, industrial AI adoption, and next-generation production systems.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">Harnessing AI and GenAI for Smarter Industrial Systems: Use Cases and Future Trends</h3>
+          <div class="card-meta">IEEE Industrial Electronics Society · Issued May 2025</div>
+          <div class="card-body">
+            <p>Explored applied AI and generative AI use cases in industrial systems.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">QS Higher Ed Summit: Asia Pacific 2024</h3>
+          <div class="card-meta">QS Quacquarelli Symonds · Issued Nov 2024</div>
+          <div class="card-body">
+            <p>Focused on higher education leadership, strategy, and interdisciplinary collaboration.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">Supervised Machine Learning: Regression and Classification</h3>
+          <div class="card-meta">Stanford University · Issued Sep 2024</div>
+          <div class="card-submeta">Credential ID: 6861CVA8WGSJ</div>
+          <div class="card-body">
+            <p>Foundational machine learning certification covering supervised learning fundamentals.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">QS India Summit 2024</h3>
+          <div class="card-meta">QS Quacquarelli Symonds · Issued Mar 2024</div>
+          <div class="card-submeta">Credential ID: 97679325</div>
+          <div class="card-body">
+            <p>Professional engagement around higher education systems, strategy, and institutional development.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">IoT Foundations: Fundamentals</h3>
+          <div class="card-meta">LinkedIn · Issued Jul 2023</div>
+          <div class="card-body">
+            <p>Covered Internet of Things fundamentals and connected-system design concepts.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">Football Analytics using Python</h3>
+          <div class="card-meta">Mad About Sports · Issued May 2021</div>
+          <div class="card-body">
+            <p>Applied analytics methods to sports data using Python, reflecting an interest in sports analytics beyond research work.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">Verified International Academic Qualifications</h3>
+          <div class="card-meta">World Education Services · Issued Sep 2020</div>
+          <div class="card-body">
+            <p>Credential verification of international academic qualifications.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">SCADA Basic</h3>
+          <div class="card-meta">Siemens · Issued Jun 2018</div>
+          <div class="card-body">
+            <p>Foundational training in SCADA systems and industrial monitoring environments.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">Electrical Engineering Simulations with ETAP</h3>
+          <div class="card-meta">Udemy</div>
+          <div class="card-body">
+            <p>Training focused on ETAP-based simulation workflows for electrical engineering applications.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">International Graduate Teaching Assistant (IGTA)</h3>
+          <div class="card-meta">University of Missouri–Kansas City</div>
+          <div class="card-body">
+            <p>Recognized training and preparation for graduate-level teaching support.</p>
+          </div>
+        </div>
+
+        <div class="card-item">
+          <h3 class="card-title">CornellX – ENGR2000X: A Hands-on Introduction to Engineering Simulations</h3>
+          <div class="card-meta">Cornell University</div>
+          <div class="card-body">
+            <p>Introductory simulation-focused engineering training with hands-on emphasis.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
 
 </div>
 
 <script>
-
-/* scroll animation */
+/* ===== SCROLL REVEAL ===== */
 const sections = document.querySelectorAll('.section');
 
-window.addEventListener('scroll', () => {
-  sections.forEach(sec => {
+function revealSections() {
+  sections.forEach((sec) => {
     const top = sec.getBoundingClientRect().top;
-    if(top < window.innerHeight - 100){
+    if (top < window.innerHeight - 90) {
       sec.classList.add('show');
     }
   });
+}
+
+window.addEventListener('load', revealSections);
+window.addEventListener('scroll', revealSections);
+window.addEventListener('resize', revealSections);
+
+/* ===== CURSOR GLOW ===== */
+const dot = document.querySelector('.cursor-dot');
+const halo = document.querySelector('.cursor-halo');
+
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+let haloX = mouseX;
+let haloY = mouseY;
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+
+  if (dot) {
+    dot.style.left = `${mouseX}px`;
+    dot.style.top = `${mouseY}px`;
+  }
 });
 
-/* cursor glow */
-const cursor = document.querySelector('.cursor');
+function animateHalo() {
+  haloX += (mouseX - haloX) * 0.14;
+  haloY += (mouseY - haloY) * 0.14;
 
-document.addEventListener('mousemove', e => {
-  cursor.style.left = e.clientX + 'px';
-  cursor.style.top = e.clientY + 'px';
-});
+  if (halo) {
+    halo.style.left = `${haloX}px`;
+    halo.style.top = `${haloY}px`;
+  }
 
+  requestAnimationFrame(animateHalo);
+}
+
+animateHalo();
 </script>
 
 </body>
