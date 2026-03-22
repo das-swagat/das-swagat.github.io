@@ -361,6 +361,240 @@ hr.soft{
   border-top:1px solid rgba(255,255,255,0.08);
   margin:24px 0;
 }
+/* ===== PAGE FRAME WITH LEFT RAIL ===== */
+
+.page-frame {
+  max-width: 1680px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1000px) 260px;
+  gap: 28px;
+  align-items: start;
+}
+
+.main-content {
+  max-width: 1000px;
+  width: 100%;
+  margin: 0;
+}
+
+.left-rail {
+  padding-top: 60px;
+}
+
+.right-rail-placeholder {
+  padding-top: 60px;
+}
+
+.rail-sticky {
+  position: sticky;
+  top: 28px;
+}
+
+.rail-box {
+  background: linear-gradient(145deg, rgba(16, 185, 129, 0.08), rgba(0, 0, 0, 0.2));
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  padding: 20px;
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.rail-box:hover {
+  transform: translateY(-4px);
+  border-color: #34d399;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+}
+
+.rail-title {
+  font-size: 1.2rem;
+  color: #d1fae5;
+  margin: 0 0 14px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.kpi-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 12px;
+  transition: all 0.25s ease;
+}
+
+.kpi-card:hover {
+  border-color: #34d399;
+  transform: translateY(-2px);
+}
+
+.kpi-label {
+  display: block;
+  color: #bde7da;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.kpi-value {
+  display: block;
+  color: #ecfdf5;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.chart-head {
+  color: #d1fae5;
+  font-size: 0.92rem;
+  margin: 6px 0 10px 0;
+}
+
+.chart-shell {
+  position: relative;
+  height: 220px;
+  padding: 12px 6px 28px 6px;
+  border-radius: 12px;
+  background:
+    linear-gradient(to top,
+      transparent 0,
+      transparent 32.8%,
+      rgba(255,255,255,0.06) 32.8%,
+      rgba(255,255,255,0.06) 33.3%,
+      transparent 33.3%,
+      transparent 65.8%,
+      rgba(255,255,255,0.06) 65.8%,
+      rgba(255,255,255,0.06) 66.3%,
+      transparent 66.3%,
+      transparent 100%);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.chart-axis {
+  position: absolute;
+  right: -2px;
+  top: 4px;
+  bottom: 24px;
+  width: 28px;
+  pointer-events: none;
+}
+
+.axis-label {
+  position: absolute;
+  right: 0;
+  color: #a7d8c8;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.axis-top {
+  top: 2px;
+}
+
+.axis-mid {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.axis-bottom {
+  bottom: 2px;
+}
+
+.bar-chart {
+  position: absolute;
+  left: 8px;
+  right: 34px;
+  bottom: 12px;
+  top: 12px;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.bar-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.bar-value {
+  color: #bde7da;
+  font-size: 0.7rem;
+  margin-bottom: 6px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.bar-col:hover .bar-value {
+  opacity: 1;
+}
+
+.bar {
+  width: 100%;
+  max-width: 22px;
+  height: 0;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, #6ee7b7, #16a34a);
+  box-shadow: 0 0 16px rgba(52,211,153,0.25);
+  transition: height 1s ease;
+}
+
+.bar-year {
+  color: #bde7da;
+  font-size: 0.72rem;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.chart-foot {
+  color: #a7d8c8;
+  font-size: 0.72rem;
+  margin-top: 10px;
+}
+
+@media (max-width: 1500px) {
+  .page-frame {
+    grid-template-columns: 260px minmax(0, 1000px);
+  }
+
+  .right-rail-placeholder {
+    display: none;
+  }
+}
+
+@media (max-width: 1120px) {
+  .page-frame {
+    grid-template-columns: 1fr;
+  }
+
+  .left-rail {
+    padding-top: 20px;
+    order: -1;
+  }
+
+  .rail-sticky {
+    position: static;
+  }
+
+  .main-content {
+    max-width: 100%;
+  }
+
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+  
 </style>
 </head>
 <body>
@@ -368,7 +602,52 @@ hr.soft{
 <div class="cursor-dot"></div>
 <div class="cursor-halo"></div>
 
-<div class="container">
+<div class="page-frame">
+
+  <aside class="left-rail">
+    <div class="rail-sticky">
+      <div class="rail-box">
+        <h3 class="rail-title">Scholar Snapshot</h3>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-label">Total Citations</span>
+            <span class="kpi-value" id="kpi-total-citations">0</span>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-label">h-index</span>
+            <span class="kpi-value" id="kpi-h-index">0</span>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-label">i10-index</span>
+            <span class="kpi-value" id="kpi-i10-index">0</span>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-label">Citations Since 2021</span>
+            <span class="kpi-value" id="kpi-last-five">0</span>
+          </div>
+        </div>
+
+        <div class="chart-head">Citations by Year</div>
+
+        <div class="chart-shell">
+          <div class="chart-axis">
+            <span class="axis-label axis-top" id="axis-top">32</span>
+            <span class="axis-label axis-mid" id="axis-mid">16</span>
+            <span class="axis-label axis-bottom">0</span>
+          </div>
+          <div class="bar-chart" id="scholar-bar-chart"></div>
+        </div>
+
+        <div class="chart-foot">Styled from your Google Scholar profile</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="container main-content">
 
   <!-- HERO -->
   <section class="section hero">
@@ -662,7 +941,7 @@ hr.soft{
         <a class="card-item" href="https://www.researchgate.net/publication/400315202_An_Edge_Computing-Based_Fault_Detection_and_Localization_for_Intelligent_DG_Unit_Disconnection_in_Power_Distribution_Networks" target="_blank" rel="noopener noreferrer">
           <h3 class="card-title">An Edge Computing–Based Fault Detection and Localization for Intelligent DG Unit Disconnection in Power Distribution Networks</h3>
           <div class="card-meta">Patent · May 2024</div>
-          <div class="card-submeta">Pampa Sinha · Swagat Das · Chitralekha Jena</div>
+          <div class="card-submeta">Swagat Das et al. </div>
           <div class="card-body">
             <p>This invention addresses stability challenges caused by integrating distributed generation units such as solar and wind into modern power grids.</p>
             <ul class="detail-list">
@@ -676,7 +955,7 @@ hr.soft{
         <a class="card-item" href="https://www.researchgate.net/publication/400315523_IoT-Based_Data_Acquisition_Server_Machine" target="_blank" rel="noopener noreferrer">
           <h3 class="card-title">IoT-Based Data Acquisition Server Machine</h3>
           <div class="card-meta">Patent · January 2024</div>
-          <div class="card-submeta">Swagat Das</div>
+          <div class="card-submeta">Swagat Das et al. </div>
           <div class="card-body">
             <p>This design patent covers the structural and aesthetic design of an IoT-based data acquisition server machine for reliable collection, aggregation, and transmission of sensor data.</p>
             <ul class="detail-list">
@@ -987,16 +1266,19 @@ hr.soft{
     </div>
   </section>
 
+  </div>
+
+  <aside class="right-rail-placeholder" aria-hidden="true"></aside>
 </div>
 
 <script>
-/* ===== SCROLL REVEAL ===== */
+/* ===== SCROLL ANIMATION ===== */
 const sections = document.querySelectorAll('.section');
 
 function revealSections() {
-  sections.forEach((sec) => {
+  sections.forEach(sec => {
     const top = sec.getBoundingClientRect().top;
-    if (top < window.innerHeight - 90) {
+    if (top < window.innerHeight - 100) {
       sec.classList.add('show');
     }
   });
@@ -1015,7 +1297,7 @@ let mouseY = window.innerHeight / 2;
 let haloX = mouseX;
 let haloY = mouseY;
 
-document.addEventListener('mousemove', (e) => {
+document.addEventListener('mousemove', e => {
   mouseX = e.clientX;
   mouseY = e.clientY;
 
@@ -1038,6 +1320,89 @@ function animateHalo() {
 }
 
 animateHalo();
+
+/* ===== SCHOLAR STATS ===== */
+/* These values are initialized from the Scholar screenshot you shared. */
+/* You only need to update numbers here later. */
+
+const scholarStats = {
+  totalCitations: 164,
+  hIndex: 8,
+  i10Index: 6,
+  citationsSince2021: 134,
+  yearlyCitations: [
+    { year: 2019, citations: 11 },
+    { year: 2020, citations: 13 },
+    { year: 2021, citations: 19 },
+    { year: 2022, citations: 20 },
+    { year: 2023, citations: 27 },
+    { year: 2024, citations: 32 },
+    { year: 2025, citations: 31 },
+    { year: 2026, citations: 4 }
+  ]
+};
+
+function animateCounter(elementId, targetValue, duration = 1200) {
+  const element = document.getElementById(elementId);
+  if (!element) return;
+
+  const startTime = performance.now();
+
+  function update(currentTime) {
+    const progress = Math.min((currentTime - startTime) / duration, 1);
+    const value = Math.floor(progress * targetValue);
+    element.textContent = value;
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    } else {
+      element.textContent = targetValue;
+    }
+  }
+
+  requestAnimationFrame(update);
+}
+
+function renderScholarChart() {
+  const chart = document.getElementById('scholar-bar-chart');
+  if (!chart) return;
+
+  const data = scholarStats.yearlyCitations;
+  const maxValue = Math.max(...data.map(d => d.citations));
+
+  const axisTop = document.getElementById('axis-top');
+  const axisMid = document.getElementById('axis-mid');
+
+  if (axisTop) axisTop.textContent = maxValue;
+  if (axisMid) axisMid.textContent = Math.round(maxValue / 2);
+
+  chart.innerHTML = data.map((item, index) => {
+    const targetHeight = (item.citations / maxValue) * 100;
+    return `
+      <div class="bar-col">
+        <div class="bar-value">${item.citations}</div>
+        <div class="bar" data-height="${targetHeight}"></div>
+        <div class="bar-year">${item.year}</div>
+      </div>
+    `;
+  }).join('');
+
+  requestAnimationFrame(() => {
+    const bars = chart.querySelectorAll('.bar');
+    bars.forEach((bar, index) => {
+      setTimeout(() => {
+        bar.style.height = bar.dataset.height + '%';
+      }, index * 90);
+    });
+  });
+}
+
+window.addEventListener('load', () => {
+  animateCounter('kpi-total-citations', scholarStats.totalCitations);
+  animateCounter('kpi-h-index', scholarStats.hIndex);
+  animateCounter('kpi-i10-index', scholarStats.i10Index);
+  animateCounter('kpi-last-five', scholarStats.citationsSince2021);
+  renderScholarChart();
+});
 </script>
 
 </body>
