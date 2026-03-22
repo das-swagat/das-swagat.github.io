@@ -506,15 +506,24 @@ hr.soft{
   bottom: 2px;
 }
 
-.bar-chart {
-  position: absolute;
-  left: 8px;
-  right: 34px;
-  bottom: 12px;
-  top: 12px;
-  display: flex;
-  align-items: stretch;
-  gap: 10px;
+.chart-shell {
+  position: relative;
+  height: 220px;
+  padding: 12px 6px 34px 6px;
+  border-radius: 12px;
+  background:
+    linear-gradient(to top,
+      transparent 0,
+      transparent 32.8%,
+      rgba(255,255,255,0.06) 32.8%,
+      rgba(255,255,255,0.06) 33.3%,
+      transparent 33.3%,
+      transparent 65.8%,
+      rgba(255,255,255,0.06) 65.8%,
+      rgba(255,255,255,0.06) 66.3%,
+      transparent 66.3%,
+      transparent 100%);
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
 .bar-col {
@@ -609,7 +618,7 @@ hr.soft{
   <aside class="left-rail">
     <div class="rail-sticky">
       <div class="rail-box">
-        <h3 class="rail-title">Scholar Snapshot</h3>
+        <h3 class="rail-title">Google Scholar Snapshot</h3>
 
         <div class="kpi-grid">
           <div class="kpi-card">
@@ -644,7 +653,6 @@ hr.soft{
           <div class="bar-chart" id="scholar-bar-chart"></div>
         </div>
 
-        <div class="chart-foot">Styled from your Google Scholar profile</div>
       </div>
     </div>
   </aside>
@@ -1383,7 +1391,7 @@ function renderScholarChart() {
       <div class="bar-col">
         <div class="bar-value">${item.citations}</div>
         <div class="bar" data-height="${targetHeight}"></div>
-        <div class="bar-year">${item.year}</div>
+        <div class="bar-year">${String(item.year).slice(2)}</div>
       </div>
     `;
   }).join('');
