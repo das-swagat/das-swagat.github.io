@@ -379,8 +379,11 @@ hr.soft{
 }
 
 .left-rail {
-  padding-top: 60px;
+  position: sticky;
+  top: 80px;
   align-self: start;
+  height: fit-content;
+  padding-top: 0;
 }
 
 .right-rail-placeholder {
@@ -388,8 +391,7 @@ hr.soft{
 }
 
 .rail-sticky {
-  position: sticky;
-  top: 100px;
+  position: static;
 }
 
 .rail-box {
@@ -580,13 +582,16 @@ hr.soft{
   }
 
   .left-rail {
-    padding-top: 20px;
-    order: -1;
-  }
+  position: static;
+  top: auto;
+  height: auto;
+  padding-top: 20px;
+  order: -1;
+}
 
-  .rail-sticky {
-    position: static;
-  }
+.rail-sticky {
+  position: static;
+}
 
   .main-content {
     max-width: 100%;
