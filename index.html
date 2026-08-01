@@ -1758,7 +1758,7 @@ hr.soft{
 
 <script>
 
-/* ===== DYNAMIC CIRCUIT BACKDROP ===== */
+/* ===== DYNAMIC MULTI-STAGE BACKDROP ===== */
 (() => {
   const canvas = document.getElementById('dynamic-circuit-bg');
   if (!canvas) return;
@@ -1773,28 +1773,41 @@ hr.soft{
   let scrollProgress = 0;
   let targetScrollProgress = 0;
   let lastFrame = 0;
-  let paths = [];
-  let nodes = [];
-
-  const palette = {
-    trace: [40, 180, 130],
-    traceAlt: [20, 150, 150],
-    pulse: [110, 255, 190],
-    node: [75, 235, 170]
-  };
+  let circuitPaths = [];
+  let circuitNodes = [];
+  let neuralNodes = [];
+  let stars = [];
 
   function seededRandom(seed) {
-    let value = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+    const value = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
     return value - Math.floor(value);
+  }
+
+  function clamp(value, min = 0, max = 1) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function smoothstep(edge0, edge1, value) {
+    const t = clamp((value - edge0) / Math.max(0.0001, edge1 - edge0));
+    return t * t * (3 - 2 * t);
+  }
+
+  function stageWeights(progress) {
+    const galaxyOut = 1 - smoothstep(0.34, 0.62, progress);
+    const neuralIn = smoothstep(0.26, 0.50, progress);
+    const neuralOut = 1 - smoothstep(0.68, 0.90, progress);
+    const neural = neuralIn * neuralOut;
+    const circuit = smoothstep(0.70, 0.94, progress);
+    return { galaxy: galaxyOut, neural, circuit };
   }
 
   function updateScrollTarget() {
     const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    targetScrollProgress = Math.min(1, Math.max(0, window.scrollY / maxScroll));
+    targetScrollProgress = clamp(window.scrollY / maxScroll);
   }
 
   function resizeCanvas() {
-    dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+    dpr = Math.min(window.devicePixelRatio || 1, 1.6);
     width = window.innerWidth;
     height = window.innerHeight;
     canvas.width = Math.round(width * dpr);
@@ -1802,15 +1815,20 @@ hr.soft{
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    buildNetwork();
+    buildSceneData();
   }
 
-  function buildNetwork() {
-    paths = [];
-    nodes = [];
+  function buildSceneData() {
+    buildCircuit();
+    buildNeural();
+    buildStars();
+  }
 
-    const pathCount = coarsePointer.matches ? 10 : 18;
-    const margin = Math.max(38, width * 0.025);
+  function buildCircuit() {
+    circuitPaths = [];
+    circuitNodes = [];
+    const pathCount = coarsePointer.matches ? 9 : 17;
+    const margin = Math.max(36, width * 0.025);
 
     for (let i = 0; i < pathCount; i += 1) {
       const fromLeft = i % 2 === 0;
@@ -1821,26 +1839,60 @@ hr.soft{
       for (let j = 0; j < pointCount; j += 1) {
         const ratio = j / (pointCount - 1);
         const x = fromLeft ? ratio * width : width - ratio * width;
-        const verticalWave = Math.sin((ratio * Math.PI * 2) + i * 0.7) * (16 + seededRandom(i + j + 80) * 42);
-        const scrollBend = (scrollProgress - 0.5) * (i % 3 - 1) * 60;
-        const y = baseY + verticalWave + scrollBend;
-        points.push({ x, y });
+        const wave = Math.sin(ratio * Math.PI * 2 + i * 0.7) * (15 + seededRandom(i + j + 80) * 38);
+        points.push({ x, y: baseY + wave });
       }
 
-      paths.push({
+      circuitPaths.push({
         points,
         phase: seededRandom(i + 120),
         speed: 0.035 + seededRandom(i + 130) * 0.05,
-        alpha: 0.10 + seededRandom(i + 140) * 0.13,
-        width: 0.55 + seededRandom(i + 150) * 0.75,
+        alpha: 0.10 + seededRandom(i + 140) * 0.12,
+        width: 0.55 + seededRandom(i + 150) * 0.7,
         alt: i % 4 === 0
       });
 
-      const nodeIndex = 1 + Math.floor(seededRandom(i + 170) * Math.max(1, pointCount - 2));
-      nodes.push({
+      circuitNodes.push({
         pathIndex: i,
-        pointIndex: nodeIndex,
+        pointIndex: 1 + Math.floor(seededRandom(i + 170) * Math.max(1, pointCount - 2)),
         phase: seededRandom(i + 180)
+      });
+    }
+  }
+
+  function buildNeural() {
+    neuralNodes = [];
+    const count = coarsePointer.matches ? 34 : 64;
+    const centerX = width * 0.55;
+    const centerY = height * 0.50;
+    const rx = Math.min(width * 0.30, 430);
+    const ry = Math.min(height * 0.34, 270);
+
+    for (let i = 0; i < count; i += 1) {
+      const angle = seededRandom(i + 300) * Math.PI * 2;
+      const radius = Math.sqrt(seededRandom(i + 330));
+      const sideBias = seededRandom(i + 360) > 0.5 ? 1 : -1;
+      const x = centerX + Math.cos(angle) * rx * radius + sideBias * rx * 0.12;
+      const y = centerY + Math.sin(angle) * ry * radius;
+      neuralNodes.push({
+        x,
+        y,
+        phase: seededRandom(i + 390),
+        size: 0.8 + seededRandom(i + 420) * 1.8
+      });
+    }
+  }
+
+  function buildStars() {
+    stars = [];
+    const count = coarsePointer.matches ? 70 : 150;
+    for (let i = 0; i < count; i += 1) {
+      stars.push({
+        x: seededRandom(i + 500) * width,
+        y: seededRandom(i + 700) * height,
+        size: 0.35 + seededRandom(i + 900) * 1.6,
+        phase: seededRandom(i + 1100),
+        depth: 0.3 + seededRandom(i + 1300) * 0.7
       });
     }
   }
@@ -1869,93 +1921,208 @@ hr.soft{
     const local = scaled - index;
     const a = points[index];
     const b = points[index + 1];
-    return {
-      x: a.x + (b.x - a.x) * local,
-      y: a.y + (b.y - a.y) * local
-    };
+    return { x: a.x + (b.x - a.x) * local, y: a.y + (b.y - a.y) * local };
   }
 
-  function drawBackgroundGlow() {
-    const hueShift = scrollProgress;
-    const gradient = ctx.createRadialGradient(
-      width * (0.18 + hueShift * 0.64),
-      height * (0.32 + Math.sin(hueShift * Math.PI) * 0.18),
-      0,
-      width * 0.5,
-      height * 0.5,
-      Math.max(width, height) * 0.78
-    );
-    gradient.addColorStop(0, `rgba(20, 125, ${Math.round(90 + hueShift * 45)}, 0.11)`);
-    gradient.addColorStop(0.5, 'rgba(8, 55, 43, 0.035)');
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  function drawAmbientGlow(weights) {
+    const centerX = width * (0.48 + scrollProgress * 0.12);
+    const centerY = height * (0.42 + Math.sin(scrollProgress * Math.PI) * 0.08);
+    const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(width, height) * 0.82);
+    const green = 0.05 * weights.circuit + 0.08 * weights.neural + 0.11 * weights.galaxy;
+    gradient.addColorStop(0, `rgba(32, 138, 110, ${green})`);
+    gradient.addColorStop(0.45, 'rgba(8, 34, 30, 0.055)');
+    gradient.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
   }
 
-  function draw(timeSeconds) {
-    ctx.clearRect(0, 0, width, height);
-    drawBackgroundGlow();
+  function drawCircuit(timeSeconds, alpha) {
+    if (alpha <= 0.002) return;
+    const driftX = (scrollProgress - 0.2) * 55;
+    const driftY = Math.sin(scrollProgress * Math.PI * 2) * 16;
 
-    const driftX = (scrollProgress - 0.5) * 70;
-    const driftY = Math.sin(scrollProgress * Math.PI * 2) * 20;
-
-    paths.forEach((path, index) => {
+    circuitPaths.forEach((path, index) => {
       const shifted = path.points.map((point, pointIndex) => ({
-        x: point.x + driftX * (index % 3 - 1) * 0.38,
+        x: point.x + driftX * (index % 3 - 1) * 0.35,
         y: point.y + driftY * Math.sin(pointIndex + index)
       }));
-
-      const rgb = path.alt ? palette.traceAlt : palette.trace;
-      drawPolyline(
-        shifted,
-        `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${path.alpha})`,
-        path.width
-      );
+      const rgb = path.alt ? [18, 155, 150] : [42, 185, 130];
+      drawPolyline(shifted, `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${path.alpha * alpha})`, path.width);
 
       if (!reducedMotion.matches) {
-        const pulseT = path.phase + timeSeconds * path.speed + scrollProgress * (0.45 + index * 0.015);
-        const pulse = pointAlongPath(shifted, pulseT);
-        const radius = 1.8 + (index % 3) * 0.65;
-        const glow = ctx.createRadialGradient(pulse.x, pulse.y, 0, pulse.x, pulse.y, radius * 7);
-        glow.addColorStop(0, `rgba(${palette.pulse.join(',')}, 0.9)`);
-        glow.addColorStop(0.28, `rgba(${palette.pulse.join(',')}, 0.34)`);
-        glow.addColorStop(1, `rgba(${palette.pulse.join(',')}, 0)`);
+        const pulse = pointAlongPath(shifted, path.phase + timeSeconds * path.speed + scrollProgress * 0.55);
+        const radius = 2 + (index % 3) * 0.55;
+        const glow = ctx.createRadialGradient(pulse.x, pulse.y, 0, pulse.x, pulse.y, radius * 8);
+        glow.addColorStop(0, `rgba(115,255,195,${0.78 * alpha})`);
+        glow.addColorStop(0.3, `rgba(80,235,175,${0.26 * alpha})`);
+        glow.addColorStop(1, 'rgba(80,235,175,0)');
         ctx.fillStyle = glow;
         ctx.beginPath();
-        ctx.arc(pulse.x, pulse.y, radius * 7, 0, Math.PI * 2);
+        ctx.arc(pulse.x, pulse.y, radius * 8, 0, Math.PI * 2);
         ctx.fill();
       }
     });
 
-    nodes.forEach((node, index) => {
-      const path = paths[node.pathIndex];
+    circuitNodes.forEach((node, index) => {
+      const path = circuitPaths[node.pathIndex];
       if (!path) return;
       const point = path.points[node.pointIndex];
-      const emphasis = 0.22 + 0.28 * Math.max(0, Math.sin(timeSeconds * 0.7 + node.phase * 8 + scrollProgress * 8));
-      ctx.fillStyle = `rgba(${palette.node.join(',')}, ${reducedMotion.matches ? 0.22 : emphasis})`;
+      const pulse = reducedMotion.matches ? 0.2 : 0.18 + 0.25 * Math.max(0, Math.sin(timeSeconds * 0.7 + node.phase * 8));
+      ctx.fillStyle = `rgba(75,235,170,${pulse * alpha})`;
       ctx.beginPath();
-      ctx.arc(point.x, point.y, 1.2 + (index % 2) * 0.8, 0, Math.PI * 2);
+      ctx.arc(point.x, point.y, 1.2 + (index % 2) * 0.7, 0, Math.PI * 2);
       ctx.fill();
     });
+  }
+
+  function drawNeural(timeSeconds, alpha) {
+    if (alpha <= 0.002) return;
+    const maxDistance = Math.min(width, height) * 0.16;
+    const offsetX = Math.sin(scrollProgress * Math.PI * 2) * 18;
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+
+    for (let i = 0; i < neuralNodes.length; i += 1) {
+      const a = neuralNodes[i];
+      for (let j = i + 1; j < neuralNodes.length; j += 1) {
+        const b = neuralNodes[j];
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < maxDistance && seededRandom(i * 97 + j * 31) > 0.53) {
+          const lineAlpha = (1 - dist / maxDistance) * 0.11 * alpha;
+          ctx.strokeStyle = `rgba(55,215,185,${lineAlpha})`;
+          ctx.lineWidth = 0.55;
+          ctx.beginPath();
+          ctx.moveTo(a.x + offsetX, a.y);
+          ctx.lineTo(b.x + offsetX, b.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    neuralNodes.forEach((node, index) => {
+      const twinkle = reducedMotion.matches ? 0.5 : 0.45 + 0.45 * Math.sin(timeSeconds * 1.1 + node.phase * 9);
+      const x = node.x + offsetX;
+      const y = node.y + Math.sin(timeSeconds * 0.35 + index) * 2;
+      const glowRadius = node.size * 6;
+      const glow = ctx.createRadialGradient(x, y, 0, x, y, glowRadius);
+      glow.addColorStop(0, `rgba(110,255,220,${0.52 * twinkle * alpha})`);
+      glow.addColorStop(0.35, `rgba(55,220,190,${0.16 * alpha})`);
+      glow.addColorStop(1, 'rgba(55,220,190,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // A faint central "brain-wave" arc gives the middle stage a recognisable silhouette.
+    ctx.strokeStyle = `rgba(80,235,185,${0.12 * alpha})`;
+    ctx.lineWidth = 1.1;
+    ctx.beginPath();
+    const cx = width * 0.55 + offsetX;
+    const cy = height * 0.50;
+    const rx = Math.min(width * 0.23, 340);
+    const ry = Math.min(height * 0.28, 210);
+    for (let i = 0; i <= 90; i += 1) {
+      const t = (i / 90) * Math.PI * 2;
+      const wobble = 1 + 0.05 * Math.sin(t * 5 + timeSeconds * 0.35);
+      const x = cx + Math.cos(t) * rx * wobble;
+      const y = cy + Math.sin(t) * ry * wobble;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawGalaxy(timeSeconds, alpha) {
+    if (alpha <= 0.002) return;
+
+    const zoomProgress = smoothstep(0.00, 0.74, scrollProgress);
+    const cx = width * (0.54 - zoomProgress * 0.07);
+    const cy = height * (0.46 + zoomProgress * 0.05);
+    const rotation = reducedMotion.matches ? 0.12 + scrollProgress * 0.22 : timeSeconds * 0.012 + scrollProgress * 0.22;
+    const maxR = Math.min(width, height) * (0.34 + zoomProgress * 1.05);
+    const starZoom = 1 + zoomProgress * 0.18;
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+
+    stars.forEach((star) => {
+      const twinkle = reducedMotion.matches ? 0.55 : 0.35 + 0.65 * Math.max(0, Math.sin(timeSeconds * (0.35 + star.depth) + star.phase * 10));
+      const sx = cx + (star.x - width * 0.5) * starZoom;
+      const sy = cy + (star.y - height * 0.5) * starZoom;
+      ctx.fillStyle = `rgba(170,235,215,${0.18 * twinkle * alpha})`;
+      ctx.beginPath();
+      ctx.arc(sx, sy, star.size * (0.95 + zoomProgress * 0.15), 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    const arms = 4;
+    const particlesPerArm = coarsePointer.matches ? 85 : 165;
+    for (let arm = 0; arm < arms; arm += 1) {
+      for (let i = 0; i < particlesPerArm; i += 1) {
+        const p = i / particlesPerArm;
+        const jitter = (seededRandom(arm * 1000 + i + 1500) - 0.5) * 0.28;
+        const angle = arm * (Math.PI * 2 / arms) + p * Math.PI * 3.1 + rotation + jitter;
+        const radius = p * maxR * (0.32 + 0.68 * seededRandom(arm * 2000 + i + 1700));
+        const squash = 0.48 - zoomProgress * 0.14;
+        const x = cx + Math.cos(angle) * radius;
+        const y = cy + Math.sin(angle) * radius * squash;
+        const brightness = (1 - p * 0.40) * alpha;
+        const size = (0.45 + seededRandom(arm * 3000 + i + 1900) * 1.25) * (1 + zoomProgress * 0.18);
+        const colorMix = seededRandom(arm * 4000 + i + 2100);
+        const r = Math.round(92 + colorMix * 42);
+        const g = Math.round(185 + colorMix * 40);
+        const b = Math.round(150 + colorMix * 48);
+        ctx.fillStyle = `rgba(${r},${g},${b},${0.16 * brightness})`;
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    const core = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(width, height) * (0.16 + zoomProgress * 0.18));
+    core.addColorStop(0, `rgba(225,255,215,${0.18 * alpha})`);
+    core.addColorStop(0.16, `rgba(120,245,190,${0.12 * alpha})`);
+    core.addColorStop(0.46, `rgba(44,155,135,${0.055 * alpha})`);
+    core.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = core;
+    ctx.beginPath();
+    ctx.arc(cx, cy, Math.min(width, height) * (0.16 + zoomProgress * 0.18), 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function draw(timeSeconds) {
+    ctx.clearRect(0, 0, width, height);
+    const weights = stageWeights(scrollProgress);
+    drawAmbientGlow(weights);
+    drawCircuit(timeSeconds, weights.circuit);
+    drawNeural(timeSeconds, weights.neural);
+    drawGalaxy(timeSeconds, weights.galaxy);
   }
 
   function animate(timestamp) {
     const elapsed = lastFrame ? Math.min(50, timestamp - lastFrame) : 16;
     lastFrame = timestamp;
-    scrollProgress += (targetScrollProgress - scrollProgress) * Math.min(1, elapsed / 140);
+    scrollProgress += (targetScrollProgress - scrollProgress) * Math.min(1, elapsed / 135);
     draw(timestamp / 1000);
     requestAnimationFrame(animate);
   }
 
   window.addEventListener('scroll', updateScrollTarget, { passive: true });
   window.addEventListener('resize', resizeCanvas);
-  reducedMotion.addEventListener?.('change', buildNetwork);
-  coarsePointer.addEventListener?.('change', buildNetwork);
+  reducedMotion.addEventListener?.('change', buildSceneData);
+  coarsePointer.addEventListener?.('change', buildSceneData);
 
   updateScrollTarget();
   resizeCanvas();
   requestAnimationFrame(animate);
 })();
+
 
 /* ===== SCROLL ANIMATION ===== */
 const sections = document.querySelectorAll('.section');
