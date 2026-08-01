@@ -178,14 +178,31 @@ h1{
   gap:14px;
 }
 
-.top-links a{
+.top-links .top-link,
+.top-links .top-link:link,
+.top-links .top-link:visited{
+  display:inline;
   color:var(--accent);
   text-decoration:none;
   font-weight:500;
+  padding:0;
+  margin:0;
+  border:0;
+  border-radius:0;
+  background:none;
+  box-shadow:none;
+  outline-offset:4px;
+  line-height:inherit;
+  appearance:none;
+  -webkit-appearance:none;
 }
 
-.top-links a:hover{
+.top-links .top-link:hover,
+.top-links .top-link:focus{
   color:var(--accent-soft);
+  background:none;
+  border:0;
+  box-shadow:none;
 }
 
 /* ===== STORY STYLE APPLIED TO ALL SECTIONS ===== */
@@ -688,16 +705,6 @@ hr.soft{
   line-height:1.55;
 }
 
-.top-links .primary-link{
-  border:1px solid rgba(52,211,153,0.48);
-  background:rgba(52,211,153,0.08);
-  border-radius:9px;
-  padding:6px 10px;
-}
-
-.top-links .primary-link:hover{
-  background:rgba(52,211,153,0.15);
-}
 
 .subsection-label{
   margin:4px 0 18px;
@@ -1038,12 +1045,12 @@ hr.soft{
       <p class="hero-role">PhD Researcher · Artificial Intelligence · Computer Vision · Cybersecurity · Cyber-Physical Systems</p>
       <p class="hero-focus">LiDAR and 3D Perception · Edge AI · Agentic LLMs · Smart Manufacturing · Medical Imaging</p>
       <nav class="top-links" aria-label="Research and professional profiles">
-        <a class="primary-link" href="assets/Swagat_Das_Resume.pdf" target="_blank" rel="noopener">Resume</a>
-        <a href="https://github.com/das-swagat" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://scholar.google.com/citations?user=_X50sTMAAAAJ" target="_blank" rel="noopener noreferrer">Scholar</a>
-        <a href="https://www.linkedin.com/in/swagat-das/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-        <a href="https://www.researchgate.net/profile/Swagat-Das" target="_blank" rel="noopener noreferrer">ResearchGate</a>
-        <a href="https://orcid.org/0000-0003-2263-0217" target="_blank" rel="noopener noreferrer">ORCID</a>
+        <a class="top-link" href="assets/Swagat_Das_Resume.pdf" target="_blank" rel="noopener">Resume</a>
+        <a class="top-link" href="https://github.com/das-swagat" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="top-link" href="https://scholar.google.com/citations?user=_X50sTMAAAAJ" target="_blank" rel="noopener noreferrer">Scholar</a>
+        <a class="top-link" href="https://www.linkedin.com/in/swagat-das/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a class="top-link" href="https://www.researchgate.net/profile/Swagat-Das" target="_blank" rel="noopener noreferrer">ResearchGate</a>
+        <a class="top-link" href="https://orcid.org/0000-0003-2263-0217" target="_blank" rel="noopener noreferrer">ORCID</a>
       </nav>
     </section>
 
@@ -1659,7 +1666,7 @@ hr.soft{
           <span class="resume-tag">2 pages</span>
         </div>
         <div class="rail-actions">
-          <a class="rail-button" href="assets/Swagat_Das_Resume.pdf" target="_blank" rel="noopener">View PDF</a>
+          <a href="assets/Swagat_Das_Resume.pdf" target="_blank" rel="noopener">View PDF</a>
           <a class="rail-button" href="assets/Swagat_Das_Resume.pdf" download="Swagat_Das_Resume.pdf">Download</a>
         </div>
       </div>
