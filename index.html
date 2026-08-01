@@ -1000,9 +1000,48 @@ hr.soft{
   }
 }
 
+
+
+/* ===== DYNAMIC CIRCUIT BACKDROP (PERSONAL SITE ONLY) ===== */
+#dynamic-circuit-bg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.72;
+}
+
+/* Keep all existing portfolio content above the canvas. */
+.page-frame,
+.cursor-dot,
+.cursor-halo {
+  position: relative;
+  z-index: 1;
+}
+
+/* The cursor elements remain fixed despite the stacking context above. */
+.cursor-dot,
+.cursor-halo {
+  position: fixed;
+  z-index: 9999;
+}
+
+@media (max-width: 900px) {
+  #dynamic-circuit-bg { opacity: 0.48; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dynamic-circuit-bg { opacity: 0.34; }
+}
+
 </style>
 </head>
 <body>
+
+<!-- Scroll-reactive circuit backdrop. It is visual only and does not affect layout or clicks. -->
+<canvas id="dynamic-circuit-bg" aria-hidden="true"></canvas>
 
 <div class="cursor-dot" aria-hidden="true"></div>
 <div class="cursor-halo" aria-hidden="true"></div>
@@ -1718,6 +1757,206 @@ hr.soft{
 </div>
 
 <script>
+
+/* ===== DYNAMIC CIRCUIT BACKDROP ===== */
+(() => {
+  const canvas = document.getElementById('dynamic-circuit-bg');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d', { alpha: true });
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const coarsePointer = window.matchMedia('(pointer: coarse)');
+
+  let width = 0;
+  let height = 0;
+  let dpr = 1;
+  let scrollProgress = 0;
+  let targetScrollProgress = 0;
+  let lastFrame = 0;
+  let paths = [];
+  let nodes = [];
+
+  const palette = {
+    trace: [40, 180, 130],
+    traceAlt: [20, 150, 150],
+    pulse: [110, 255, 190],
+    node: [75, 235, 170]
+  };
+
+  function seededRandom(seed) {
+    let value = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+    return value - Math.floor(value);
+  }
+
+  function updateScrollTarget() {
+    const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    targetScrollProgress = Math.min(1, Math.max(0, window.scrollY / maxScroll));
+  }
+
+  function resizeCanvas() {
+    dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    buildNetwork();
+  }
+
+  function buildNetwork() {
+    paths = [];
+    nodes = [];
+
+    const pathCount = coarsePointer.matches ? 10 : 18;
+    const margin = Math.max(38, width * 0.025);
+
+    for (let i = 0; i < pathCount; i += 1) {
+      const fromLeft = i % 2 === 0;
+      const baseY = margin + seededRandom(i + 1) * (height - margin * 2);
+      const pointCount = 5 + Math.floor(seededRandom(i + 40) * 4);
+      const points = [];
+
+      for (let j = 0; j < pointCount; j += 1) {
+        const ratio = j / (pointCount - 1);
+        const x = fromLeft ? ratio * width : width - ratio * width;
+        const verticalWave = Math.sin((ratio * Math.PI * 2) + i * 0.7) * (16 + seededRandom(i + j + 80) * 42);
+        const scrollBend = (scrollProgress - 0.5) * (i % 3 - 1) * 60;
+        const y = baseY + verticalWave + scrollBend;
+        points.push({ x, y });
+      }
+
+      paths.push({
+        points,
+        phase: seededRandom(i + 120),
+        speed: 0.035 + seededRandom(i + 130) * 0.05,
+        alpha: 0.10 + seededRandom(i + 140) * 0.13,
+        width: 0.55 + seededRandom(i + 150) * 0.75,
+        alt: i % 4 === 0
+      });
+
+      const nodeIndex = 1 + Math.floor(seededRandom(i + 170) * Math.max(1, pointCount - 2));
+      nodes.push({
+        pathIndex: i,
+        pointIndex: nodeIndex,
+        phase: seededRandom(i + 180)
+      });
+    }
+  }
+
+  function drawPolyline(points, strokeStyle, lineWidth) {
+    if (!points.length) return;
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i += 1) {
+      const prev = points[i - 1];
+      const curr = points[i];
+      const midX = (prev.x + curr.x) / 2;
+      ctx.lineTo(midX, prev.y);
+      ctx.lineTo(midX, curr.y);
+      ctx.lineTo(curr.x, curr.y);
+    }
+    ctx.strokeStyle = strokeStyle;
+    ctx.lineWidth = lineWidth;
+    ctx.stroke();
+  }
+
+  function pointAlongPath(points, t) {
+    const clamped = ((t % 1) + 1) % 1;
+    const scaled = clamped * (points.length - 1);
+    const index = Math.min(points.length - 2, Math.floor(scaled));
+    const local = scaled - index;
+    const a = points[index];
+    const b = points[index + 1];
+    return {
+      x: a.x + (b.x - a.x) * local,
+      y: a.y + (b.y - a.y) * local
+    };
+  }
+
+  function drawBackgroundGlow() {
+    const hueShift = scrollProgress;
+    const gradient = ctx.createRadialGradient(
+      width * (0.18 + hueShift * 0.64),
+      height * (0.32 + Math.sin(hueShift * Math.PI) * 0.18),
+      0,
+      width * 0.5,
+      height * 0.5,
+      Math.max(width, height) * 0.78
+    );
+    gradient.addColorStop(0, `rgba(20, 125, ${Math.round(90 + hueShift * 45)}, 0.11)`);
+    gradient.addColorStop(0.5, 'rgba(8, 55, 43, 0.035)');
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  function draw(timeSeconds) {
+    ctx.clearRect(0, 0, width, height);
+    drawBackgroundGlow();
+
+    const driftX = (scrollProgress - 0.5) * 70;
+    const driftY = Math.sin(scrollProgress * Math.PI * 2) * 20;
+
+    paths.forEach((path, index) => {
+      const shifted = path.points.map((point, pointIndex) => ({
+        x: point.x + driftX * (index % 3 - 1) * 0.38,
+        y: point.y + driftY * Math.sin(pointIndex + index)
+      }));
+
+      const rgb = path.alt ? palette.traceAlt : palette.trace;
+      drawPolyline(
+        shifted,
+        `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${path.alpha})`,
+        path.width
+      );
+
+      if (!reducedMotion.matches) {
+        const pulseT = path.phase + timeSeconds * path.speed + scrollProgress * (0.45 + index * 0.015);
+        const pulse = pointAlongPath(shifted, pulseT);
+        const radius = 1.8 + (index % 3) * 0.65;
+        const glow = ctx.createRadialGradient(pulse.x, pulse.y, 0, pulse.x, pulse.y, radius * 7);
+        glow.addColorStop(0, `rgba(${palette.pulse.join(',')}, 0.9)`);
+        glow.addColorStop(0.28, `rgba(${palette.pulse.join(',')}, 0.34)`);
+        glow.addColorStop(1, `rgba(${palette.pulse.join(',')}, 0)`);
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(pulse.x, pulse.y, radius * 7, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+
+    nodes.forEach((node, index) => {
+      const path = paths[node.pathIndex];
+      if (!path) return;
+      const point = path.points[node.pointIndex];
+      const emphasis = 0.22 + 0.28 * Math.max(0, Math.sin(timeSeconds * 0.7 + node.phase * 8 + scrollProgress * 8));
+      ctx.fillStyle = `rgba(${palette.node.join(',')}, ${reducedMotion.matches ? 0.22 : emphasis})`;
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, 1.2 + (index % 2) * 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  function animate(timestamp) {
+    const elapsed = lastFrame ? Math.min(50, timestamp - lastFrame) : 16;
+    lastFrame = timestamp;
+    scrollProgress += (targetScrollProgress - scrollProgress) * Math.min(1, elapsed / 140);
+    draw(timestamp / 1000);
+    requestAnimationFrame(animate);
+  }
+
+  window.addEventListener('scroll', updateScrollTarget, { passive: true });
+  window.addEventListener('resize', resizeCanvas);
+  reducedMotion.addEventListener?.('change', buildNetwork);
+  coarsePointer.addEventListener?.('change', buildNetwork);
+
+  updateScrollTarget();
+  resizeCanvas();
+  requestAnimationFrame(animate);
+})();
+
 /* ===== SCROLL ANIMATION ===== */
 const sections = document.querySelectorAll('.section');
 
