@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://das-swagat.github.io/sitemap.xml
